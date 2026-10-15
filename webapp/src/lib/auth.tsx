@@ -22,7 +22,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    // Read from localStorage on mount
     try {
       const savedUser = localStorage.getItem("scamgraph_user");
       const savedToken = localStorage.getItem("scamgraph_token");
@@ -33,11 +32,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (savedGuest === "true") {
         setIsGuest(true);
       } else {
-        // Default to demo user for instant hackathon review experience
         const defaultUser: User = {
           id: "usr-demo-1",
           email: "demo.user@scamgraph.ai",
-          name: "ผู้ใช้สาธิต (Demo User)",
+          name: "Demo User",
           role: "user",
           created_at: new Date().toISOString(),
         };
@@ -54,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const demoUser: User = {
       id: "usr-demo-1",
       email: "demo.user@scamgraph.ai",
-      name: "ผู้ใช้สาธิต (Demo User)",
+      name: "Demo User",
       role: "user",
       created_at: new Date().toISOString(),
     };
@@ -70,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const demoAdmin: User = {
       id: "usr-admin-1",
       email: "admin@scamgraph.ai",
-      name: "ผู้ดูแลระบบ (Admin Officer)",
+      name: "Admin Officer",
       role: "admin",
       created_at: new Date().toISOString(),
     };

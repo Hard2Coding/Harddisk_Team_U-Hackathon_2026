@@ -38,39 +38,39 @@ export function ScoreGauge({ score, level }: ScoreGaugeProps) {
   > = {
     HIGH: {
       text: "text-red-600 dark:text-red-400",
-      bg: "bg-red-500/10",
-      border: "border-red-500/30",
-      label: "เสี่ยงสูง / HIGH RISK",
+      bg: "bg-red-50/80 dark:bg-red-950/20",
+      border: "border-red-200 dark:border-red-800",
+      label: "HIGH SCAM RISK",
       icon: ShieldAlert,
       colorHex: "#EF4444",
-      title: "พบสัญญาณความเสี่ยงสูง ควรหยุดและตรวจสอบกับช่องทางทางการทันที",
+      title: "Strong scam signals detected. Halt all actions and verify through official channels.",
     },
     MEDIUM: {
-      text: "text-amber-600 dark:text-amber-400",
-      bg: "bg-amber-500/10",
-      border: "border-amber-500/30",
-      label: "ควรระวัง / CAUTION",
+      text: "text-amber-700 dark:text-amber-400",
+      bg: "bg-amber-50/80 dark:bg-amber-950/20",
+      border: "border-amber-200 dark:border-amber-800",
+      label: "CAUTION / REVIEW REQUIRED",
       icon: AlertTriangle,
       colorHex: "#F59E0B",
-      title: "พบสัญญาณที่ควรตรวจสอบเพิ่มเติมก่อนดำเนินการ",
+      title: "Suspicious characteristics observed. Double check independently before proceeding.",
     },
     LOW: {
-      text: "text-emerald-600 dark:text-emerald-400",
-      bg: "bg-emerald-500/10",
-      border: "border-emerald-500/30",
-      label: "ความเสี่ยงต่ำ / LOW RISK",
+      text: "text-emerald-700 dark:text-emerald-400",
+      bg: "bg-emerald-50/80 dark:bg-emerald-950/20",
+      border: "border-emerald-200 dark:border-emerald-800",
+      label: "LOW RISK OBSERVED",
       icon: CheckCircle,
       colorHex: "#10B981",
-      title: "พบสัญญาณความเสี่ยงจากข้อมูลนี้น้อย แต่ไม่ได้ยืนยันว่าปลอดภัย 100%",
+      title: "No known scam patterns detected on this input, but always remain vigilant.",
     },
     "INSUFFICIENT DATA": {
-      text: "text-slate-500",
-      bg: "bg-slate-500/10",
-      border: "border-slate-500/30",
-      label: "ข้อมูลไม่เพียงพอ / INSUFFICIENT DATA",
+      text: "text-slate-600 dark:text-slate-400",
+      bg: "bg-slate-50 dark:bg-slate-900/40",
+      border: "border-slate-200 dark:border-slate-800",
+      label: "INSUFFICIENT DATA",
       icon: HelpCircle,
       colorHex: "#64748B",
-      title: "ข้อมูลที่ระบุไม่เพียงพอสำหรับการประเมินระดับความเสี่ยง",
+      title: "Provided input is insufficient to evaluate a comprehensive risk score.",
     },
   };
 
@@ -79,7 +79,7 @@ export function ScoreGauge({ score, level }: ScoreGaugeProps) {
 
   return (
     <div
-      className={`p-6 sm:p-8 rounded-3xl border ${style.border} ${style.bg} relative overflow-hidden transition-all duration-300 shadow-sm`}
+      className={`p-6 sm:p-8 rounded-3xl border ${style.border} ${style.bg} relative overflow-hidden transition-all duration-300 shadow-xs bg-white dark:bg-[#10203A]`}
     >
       <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8">
         {/* Radial SVG Gauge */}
@@ -90,7 +90,7 @@ export function ScoreGauge({ score, level }: ScoreGaugeProps) {
               cx="50"
               cy="50"
               r={radius}
-              className="stroke-slate-200/80 dark:stroke-slate-800 fill-none"
+              className="stroke-slate-100 dark:stroke-slate-800 fill-none"
               strokeWidth="9"
             />
             {/* Animated Risk Arc */}
@@ -125,8 +125,8 @@ export function ScoreGauge({ score, level }: ScoreGaugeProps) {
               <LevelIcon className="w-3.5 h-3.5" />
               <span>{style.label}</span>
             </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400">
-              Deterministic Fusion Policy v2
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+              Deterministic Evidence Policy v2
             </span>
           </div>
 
@@ -135,7 +135,7 @@ export function ScoreGauge({ score, level }: ScoreGaugeProps) {
           </h3>
 
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
-            * คะแนนความเสี่ยงเป็นดัชนีชี้วัดตามหลักฐานที่ตรวจพบ (Evidence-grounded Risk Indicator) ไม่ใช่คำตัดสินทางกฎหมาย และการไม่มีประวัติไม่ได้แปลว่าปลอดภัยเสมอไป
+            * This score is an uncalibrated risk indicator grounded in detected signals, not a legal verdict. The absence of past records does not imply guaranteed safety.
           </p>
         </div>
       </div>

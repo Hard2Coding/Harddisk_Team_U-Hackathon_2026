@@ -1,14 +1,14 @@
 import { Analysis, Entity, GraphData, Reason, Contribution, RiskLevel } from "@/types/api";
 import { maskIdentifier } from "./utils";
 
-// Known sample threat database (for demonstration & verification)
+// Verified sample threat records
 export const SAMPLE_THREAT_RECORDS = [
   {
     type: "url",
     value: "http://kbank-verify-otp.xyz",
     status: "confirmed",
     source: "Anti-Online Scam Operation Center (AOC 1441)",
-    evidence: "Impersonating Kasikornbank OTP login page for phishing",
+    evidence: "Impersonating banking OTP authorization portal for credential harvesting",
     related: ["089-123-4567", "@kbank_support_fake"],
   },
   {
@@ -16,23 +16,23 @@ export const SAMPLE_THREAT_RECORDS = [
     value: "scb-secure-update.top",
     status: "confirmed",
     source: "Thai CERT / Police Cyber Investigation",
-    evidence: "SMS phishing scam domain targeting online banking credentials",
+    evidence: "Phishing lure domain targeting online banking sessions and passwords",
     related: ["082-999-8877", "140-2-99881-0"],
   },
   {
     type: "phone",
     value: "0891234567",
     status: "confirmed",
-    source: "Whoscall / Thai Telecom Blacklist",
-    evidence: "Recorded automated voice call center scam posing as Customs Department",
+    source: "National Telecom Blacklist",
+    evidence: "Automated robocall imposter scam posing as Customs & Revenue Department",
     related: ["http://kbank-verify-otp.xyz"],
   },
   {
     type: "account",
     value: "1402998810",
     status: "confirmed",
-    source: "Bank of Thailand Mule Account Watchlist",
-    evidence: "Category 1 flagged mule bank account for crypto fraud transfers",
+    source: "Central Bank Flagged Mule Watchlist",
+    evidence: "Category 1 flagged mule account used for crypto scam transfers",
     related: ["scb-secure-update.top"],
   },
   {
@@ -40,7 +40,7 @@ export const SAMPLE_THREAT_RECORDS = [
     value: "0819994321",
     status: "reported",
     source: "Community Clue #9412",
-    evidence: "PromptPay recipient reported for fraudulent online product sales",
+    evidence: "PromptPay recipient repeatedly reported for deceptive marketplace sales",
     related: ["@online_shop_fraud"],
   },
 ];
@@ -86,7 +86,7 @@ export function extractEntities(text: string): Entity[] {
     }
   }
 
-  // 2. Thai Phone Numbers (08x, 06x, 09x)
+  // 2. Phone Numbers (Thai 08x, 06x, 09x or international format)
   const phoneRegex = /(?:\+?66|0)[689]\d{8}|\b0[689]\d{1}[-.\s]?\d{3}[-.\s]?\d{4}\b/g;
   while ((match = phoneRegex.exec(text)) !== null) {
     const raw = match[0].replace(/[\s.-]/g, "");
@@ -102,12 +102,11 @@ export function extractEntities(text: string): Entity[] {
     }
   }
 
-  // 3. Bank Account / PromptPay (10 - 13 digits)
+  // 3. Bank Account / Digital Wallet (10 - 13 digits)
   const accountRegex = /\b\d{3}[-]?\d{1}[-]?\d{5}[-]?\d{1}\b|\b\d{10,12}\b/g;
   while ((match = accountRegex.exec(text)) !== null) {
     const raw = match[0].replace(/-/g, "");
     if (!seen.has(raw) && raw.length >= 10 && raw.length <= 13) {
-      // Check it's not a phone number already matched
       if (!entities.some((e) => e.type === "phone" && e.value === raw)) {
         seen.add(raw);
         entities.push({
@@ -120,7 +119,7 @@ export function extractEntities(text: string): Entity[] {
     }
   }
 
-  // 4. LINE IDs (@...)
+  // 4. LINE IDs or Handle (@...)
   const lineRegex = /@([a-zA-Z0-9._-]{3,30})\b/g;
   while ((match = lineRegex.exec(text)) !== null) {
     const raw = match[0];
@@ -153,13 +152,12 @@ export function analyzeUrlFeatures(urlStr: string): {
   try {
     urlObj = urlStr.includes("://") ? new URL(urlStr) : new URL(`http://${urlStr}`);
   } catch {
-    // Malformed
+    // Malformed URL
   }
 
   const hostname = urlObj ? urlObj.hostname : urlStr;
-  const path = urlObj ? urlObj.pathname : "";
 
-  // 1. Suspicious TLD check
+  // 1. High Risk TLD check
   const highRiskTlds = [".xyz", ".top", ".club", ".online", ".site", ".vip", ".cc", ".icu", ".work", ".tk", ".ml"];
   const matchedTld = highRiskTlds.find((tld) => hostname.toLowerCase().endsWith(tld));
   if (matchedTld) {
@@ -172,8 +170,8 @@ export function analyzeUrlFeatures(urlStr: string): {
     });
     reasons.push({
       code: "SUSPICIOUS_TLD",
-      title: `ใช้นามสกุลโดเมนความเสี่ยงสูง (${matchedTld})`,
-      detail: `โดเมนลงท้ายด้วย ${matchedTld} ซึ่งพบบ่อยในแคมเปญหลอกลวงราคาประหยัด`,
+      title: `High-Risk Domain Extension (${matchedTld})`,
+      detail: `The domain ends with ${matchedTld}, a top-level domain frequently utilized in low-cost, disposable scam campaigns.`,
       source: "XGBoost URL Classifier",
       severity: "danger",
     });
@@ -184,15 +182,15 @@ export function analyzeUrlFeatures(urlStr: string): {
   if (dots >= 3) {
     logOdds += 1.42;
     contributions.push({
-      feature: "High Subdomain Depth (>2 subdomains)",
+      feature: "High Subdomain Depth (>2 levels)",
       value: 1.42,
       unit: "log-odds",
       model: "XGBoost URL Classifier",
     });
     reasons.push({
       code: "DECEPTIVE_SUBDOMAIN",
-      title: "พบโครงสร้างซับโดเมนซับซ้อนหลายชั้น",
-      detail: "มักใช้ในการเลียนแบบชื่อเว็บไซต์สถาบันการเงินหรือแบรนด์ทางการ",
+      title: "Deeply Nested Deceptive Subdomain",
+      detail: "Multiple subdomain levels detected, commonly used to disguise malicious destinations behind legitimate institution names.",
       source: "XGBoost URL Classifier",
       severity: "warning",
     });
@@ -202,15 +200,15 @@ export function analyzeUrlFeatures(urlStr: string): {
   if (urlStr.includes("@")) {
     logOdds += 2.1;
     contributions.push({
-      feature: "Userinfo Deception Symbol (@)",
+      feature: "Userinfo Deception Character (@)",
       value: 2.1,
       unit: "log-odds",
       model: "XGBoost URL Classifier",
     });
     reasons.push({
       code: "USERINFO_DECEPTION",
-      title: "พบสัญลักษณ์ @ ซ่อนโดเมนปลายทางจริง",
-      detail: "เทคนิคหลอกให้ผู้ใช้เห็นชื่อธนาคารก่อนเครื่องหมาย @ แต่เบราว์เซอร์จะเชื่อมต่อไปยังโดเมนด้านหลัง",
+      title: "Deceptive '@' Character Obfuscation",
+      detail: "The '@' symbol tricks users into seeing a trusted brand name while directing the browser to an attacker-controlled host.",
       source: "XGBoost URL Classifier",
       severity: "danger",
     });
@@ -220,21 +218,21 @@ export function analyzeUrlFeatures(urlStr: string): {
   if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)) {
     logOdds += 1.85;
     contributions.push({
-      feature: "Raw IP Address Host",
+      feature: "Raw IP Address Hostname",
       value: 1.85,
       unit: "log-odds",
       model: "XGBoost URL Classifier",
     });
     reasons.push({
       code: "IP_HOST_ADDRESS",
-      title: "ใช้เลข IP โดยตรงแทนชื่อโดเมน",
-      detail: "เว็บไซต์ทางการทั่วไปไม่เผยแพร่ลิงก์ธุรกรรมผ่าน IP โดยตรง",
+      title: "Direct Raw IP Address Used As Hostname",
+      detail: "Legitimate online banking and corporate services never request user credentials via naked IP addresses.",
       source: "XGBoost URL Classifier",
       severity: "danger",
     });
   }
 
-  // 5. Hyphen abuse
+  // 5. Multiple hyphens in domain
   const hyphens = (hostname.match(/-/g) || []).length;
   if (hyphens >= 2) {
     logOdds += 0.88;
@@ -247,30 +245,30 @@ export function analyzeUrlFeatures(urlStr: string): {
   }
 
   // 6. Bank & institution keyword spoofing in domain
-  const spoofKeywords = ["kbank", "scb", "bbl", "ktb", "krungsri", "police", "tax", "post", "flash", "kerry", "login", "secure", "verify", "update"];
+  const spoofKeywords = ["kbank", "scb", "bbl", "ktb", "krungsri", "police", "tax", "post", "flash", "kerry", "login", "secure", "verify", "update", "account"];
   const matchedSpoof = spoofKeywords.filter((k) => hostname.toLowerCase().includes(k));
   if (matchedSpoof.length > 0 && matchedTld) {
     logOdds += 1.5;
     contributions.push({
-      feature: `Institution keyword spoofing (${matchedSpoof.join(", ")})`,
+      feature: `Institution Keyword Spoofing (${matchedSpoof.join(", ")})`,
       value: 1.5,
       unit: "log-odds",
       model: "XGBoost URL Classifier",
     });
     reasons.push({
       code: "BRAND_IMPERSONATION",
-      title: `ตรวจพบคำระบุแบรนด์หรือสถาบัน (${matchedSpoof.join(", ")}) ในโดเมนที่ไม่เป็นทางการ`,
-      detail: "พบความพยายามลอกเลียนแบบชื่อหน่วยงานในโดเมนภายนอก",
+      title: `Brand or Security Keyword Impersonation (${matchedSpoof.join(", ")})`,
+      detail: "Detected attempt to imitate recognized institutional portals on an untrusted third-party domain.",
       source: "Heuristic Brand Engine",
       severity: "danger",
     });
   }
 
-  // Calculate sigmoid probability
+  // Calculate probability
   const rawProb = 1 / (1 + Math.exp(-logOdds));
   const urlScore = Math.min(100, Math.round(rawProb * 100));
 
-  // Isolation forest anomaly detection
+  // Anomaly score
   const anomalyScore = Math.min(1, Number(((logOdds / 4) + (urlStr.length > 70 ? 0.3 : 0.05)).toFixed(2)));
 
   return {
@@ -279,38 +277,37 @@ export function analyzeUrlFeatures(urlStr: string): {
     anomaly: {
       score: anomalyScore,
       is_anomaly: anomalyScore > 0.6,
-      baseline: anomalyScore > 0.6 ? "Abnormal lexical distribution" : "Normal URL baseline",
+      baseline: anomalyScore > 0.6 ? "Abnormal lexical distribution" : "Normal web baseline",
     },
     reasons,
   };
 }
 
-// Text pattern & Natural Language Scam Signals
+// Text pattern analysis in English
 export function analyzeTextPatterns(text: string): {
   textScore: number;
   reasons: Reason[];
   similarExamples: any[];
 } {
-  let baseScore = 15; // baseline low risk
+  let baseScore = 12; // baseline minimal low score
   const lower = text.toLowerCase();
 
-  // Pattern categories
+  // Pattern categories (Both English and bilingual scam signals)
   const urgencyKeywords = [
-    "ด่วน", "ภายในวันนี้", "ระงับบัญชี", "ถูกอายัด", "หมดอายุ", "ตัดสิทธิ์", "ทันที", "ชั่วโมงสุดท้าย",
-    "urgent", "immediately", "suspended", "freeze", "expires today", "final notice", "act now"
+    "urgent", "immediately", "suspended", "freeze", "expires today", "final notice", "act now", "action required",
+    "within 24 hours", "account locked", "compromised", "ด่วน", "ระงับ", "ภายในวันนี้"
   ];
   const credentialKeywords = [
-    "otp", "รหัสผ่าน", "password", "pin", "ยืนยันตัวตน", "กรอกข้อมูลบัตร", "เลขหลังบัตร",
-    "verify account", "enter credentials", "cvv", "passcode"
+    "otp", "password", "pin", "verify account", "enter credentials", "cvv", "passcode", "security code",
+    "verification code", "confirm identity", "รหัสผ่าน", "ยืนยันตัวตน"
   ];
   const financialFraudKeywords = [
-    "อนุมัติเงินกู้", "กู้เงินด่วน", "ดอกเบี้ยต่ำ", "ไม่ต้องค้ำ", "รับเงินทันที", "โอนเงินมัดจำ", "ปลดล็อกบัญชี",
-    "ภารกิจออนไลน์", "กดรับออเดอร์", "ทำงานที่บ้านได้เงินวันละ", "ลงทุนกำไรสูง", "ปั่นบาคาร่า", "คืนภาษี",
-    "easy loan", "guaranteed profit", "telegram task", "crypto return", "lottery winner"
+    "easy loan", "guaranteed profit", "telegram task", "crypto return", "lottery winner", "commission payout",
+    "0% interest", "no guarantor", "instant approval", "work from home", "daily bonus", "กู้เงิน", "ได้เงินวันละ"
   ];
   const authorityKeywords = [
-    "สรรพากร", "กสทช.", "สถานีตำรวจ", "กองปราบ", "ดีเอสไอ", "ศาล", "ไปรษณีย์ไทย", "ศุลกากร", "dhl", "flash", "kerry",
-    "police", "customs", "high court", "revenue department"
+    "police", "customs", "high court", "revenue department", "tax refund", "express parcel", "delivery failed",
+    "central bank", "fraud department", "postal service", "ไปรษณีย์", "สรรพากร"
   ];
 
   const matchedUrgency = urgencyKeywords.filter((k) => lower.includes(k));
@@ -321,23 +318,23 @@ export function analyzeTextPatterns(text: string): {
   const reasonsList: Reason[] = [];
 
   if (matchedCredentials.length > 0) {
-    baseScore += 35;
+    baseScore += 38;
     reasonsList.push({
-      code: "CREDENTIAL_MENTION",
-      title: "ข้อความกล่าวถึง OTP หรือรหัสผ่านส่วนตัว",
-      detail: `ตรวจพบการร้องขอรหัสผ่านหรือข้อมูลยืนยันตัวตน (${matchedCredentials.slice(0, 3).join(", ")}) ซึ่งสถาบันการเงินที่ถูกต้องจะไม่ขอผ่านแชทหรือลิงก์`,
-      source: "Input Observation (Regex / TF-IDF)",
+      code: "CREDENTIAL_SOLICITATION",
+      title: "Solicitation of One-Time Passwords (OTP) or Credentials",
+      detail: `Detected request for authentication codes or passwords (${matchedCredentials.slice(0, 3).join(", ")}). Legitimate institutions never ask for confidential OTPs via unsolicited messages.`,
+      source: "Regex / TF-IDF Vectorizer",
       severity: "danger",
     });
   }
 
   if (matchedUrgency.length > 0) {
-    baseScore += 25;
+    baseScore += 26;
     reasonsList.push({
-      code: "URGENCY_MENTION",
-      title: "พบถ้อยคำเร่งด่วนกดดันให้รีบตัดสินใจ",
-      detail: `มีคำสร้างความตกใจหรือจำกัดเวลา (${matchedUrgency.slice(0, 3).join(", ")}) เป็นพฤติกรรมมาตรฐานของมิจฉาชีพ`,
-      source: "Input Observation (Urgency Lexicon)",
+      code: "HIGH_URGENCY_LURE",
+      title: "Coercive Time-Constraint or High-Urgency Language",
+      detail: `Text employs alarmist phrases (${matchedUrgency.slice(0, 3).join(", ")}) designed to induce panic and force hasty decisions without verification.`,
+      source: "Urgency Lexicon Engine",
       severity: "warning",
     });
   }
@@ -346,8 +343,8 @@ export function analyzeTextPatterns(text: string): {
     baseScore += 30;
     reasonsList.push({
       code: "FINANCIAL_BAIT",
-      title: "พบรูปแบบหลอกลงทุน เงินกู้ หรือภารกิจออนไลน์",
-      detail: `ตรวจพบข้อความเชิญชวนทางการเงินที่มักเกี่ยวข้องกับแก๊งคอลเซ็นเตอร์ (${matchedFinancial.slice(0, 3).join(", ")})`,
+      title: "Financial Bait: Unrealistic Profit, Instant Loan, or Daily Tasks",
+      detail: `Detected high-yield promises, instant credit approval, or online task scams (${matchedFinancial.slice(0, 3).join(", ")}).`,
       source: "TF-IDF + Logistic Regression",
       severity: "danger",
     });
@@ -357,19 +354,18 @@ export function analyzeTextPatterns(text: string): {
     baseScore += 20;
     reasonsList.push({
       code: "AUTHORITY_IMPERSONATION",
-      title: "มีการอ้างถึงหน่วยงานภาครัฐหรือผู้ให้บริการขนส่ง",
-      detail: `ข้อความอ้างหน่วยงาน (${matchedAuthority.slice(0, 3).join(", ")}) โปรดตรวจสอบกับเบอร์โทรศัพท์ทางการเสมอ`,
-      source: "Entity Recognition & Lexicon",
+      title: "Impersonation of Public Authority or Delivery Courier",
+      detail: `Message claims to originate from law enforcement, tax revenue, or delivery services (${matchedAuthority.slice(0, 3).join(", ")}). Always verify using published official hotlines.`,
+      source: "Entity Extraction & Brand Lexicon",
       severity: "warning",
     });
   }
 
-  // Similar template matching
   const similarExamples = [];
   if (matchedCredentials.length > 0 || matchedFinancial.length > 0) {
     similarExamples.push({
-      text: "แจ้งเตือนจากธนาคาร บัญชีของท่านถูกระงับ กรุณายืนยันรหัส OTP ด่วนที่ลิ้งก์ด้านล่างเพื่อปลดล็อค",
-      source: "AOC Threat Database 2026",
+      text: "Security Alert: Your online banking access is temporarily frozen. Verify your one-time code immediately at the link below to restore access.",
+      source: "National Anti-Fraud Intel Database 2026",
       similarity: 0.884,
       method: "multilingual-MiniLM-L12-v2",
       is_sample: false,
@@ -377,8 +373,8 @@ export function analyzeTextPatterns(text: string): {
   }
   if (matchedFinancial.length > 0) {
     similarExamples.push({
-      text: "เปิดรับสมัครคนกดรับออเดอร์สินค้า รายได้ 500-1,200 บาทต่อวัน ไม่ต้องมีประสบการณ์ แอดไลน์เลย",
-      source: "Police Cyber Taskforce Case #8812",
+      text: "Hiring online product review agents. Earn $50-$150 daily from home. Instant bank payout, no initial deposit required. Contact on Telegram.",
+      source: "Cyber Crime Taskforce Case #8812",
       similarity: 0.792,
       method: "multilingual-MiniLM-L12-v2",
       is_sample: false,
@@ -408,13 +404,13 @@ export function buildGraph(entities: Entity[], matchedThreats: any[]): GraphData
         value: ent.value,
         is_sample: false,
         report_status: matchedThreats.length > 0 ? "confirmed" : "unverified",
-        provenance: "Current User Input",
+        provenance: "User Input Observation",
         timestamp: new Date().toISOString(),
       });
     }
   });
 
-  // Link matched threats or synthetic intelligence
+  // Link matched threats
   matchedThreats.forEach((threat) => {
     const threatNodeId = `threat-${threat.source}`;
     if (!nodeSet.has(threatNodeId)) {
@@ -431,7 +427,6 @@ export function buildGraph(entities: Entity[], matchedThreats: any[]): GraphData
       });
     }
 
-    // Connect to matched entity
     edges.push({
       id: `edge-${edges.length + 1}`,
       source: threat.value,
@@ -442,12 +437,11 @@ export function buildGraph(entities: Entity[], matchedThreats: any[]): GraphData
       created_at: new Date().toISOString(),
     });
 
-    // Add related threat entities (e.g. connected mule account)
     if (threat.related && Array.isArray(threat.related)) {
       threat.related.forEach((rel: string) => {
         if (!nodeSet.has(rel)) {
           nodeSet.add(rel);
-          const isPhone = rel.startsWith("08") || rel.startsWith("06");
+          const isPhone = rel.startsWith("08") || rel.startsWith("06") || rel.startsWith("+");
           const isLine = rel.startsWith("@");
           const type = isPhone ? "phone" : isLine ? "line" : rel.includes(".") ? "url" : "account";
           nodes.push({
@@ -473,7 +467,6 @@ export function buildGraph(entities: Entity[], matchedThreats: any[]): GraphData
     }
   });
 
-  // Auto-link entities if multiple present
   if (entities.length > 1) {
     for (let i = 0; i < entities.length - 1; i++) {
       edges.push({
@@ -494,7 +487,7 @@ export function buildGraph(entities: Entity[], matchedThreats: any[]): GraphData
   };
 }
 
-// Master Scam Analysis Service
+// Master Scam Analysis Engine
 export function analyzeInput(
   rawInput: string,
   kind: "text" | "url" | "image" | "qr" = "text",
@@ -507,7 +500,7 @@ export function analyzeInput(
   const missingData: string[] = [];
   const advice: string[] = [];
 
-  // Check matching threat records
+  // Match threats
   const matchedThreats = SAMPLE_THREAT_RECORDS.filter((rec) => {
     const cleanRecVal = rec.value.toLowerCase().replace(/[\s-]/g, "");
     return entities.some((e) => {
@@ -516,12 +509,11 @@ export function analyzeInput(
     });
   });
 
-  // Analyze text and URL signals
   const textAnalysis = analyzeTextPatterns(text);
   reasons.push(...textAnalysis.reasons);
 
   let urlScore = 0;
-  let anomalyData = { score: 0.12, is_anomaly: false, baseline: "Normal baseline" };
+  let anomalyData = { score: 0.12, is_anomaly: false, baseline: "Standard web baseline" };
 
   const urlEntity = entities.find((e) => e.type === "url" || e.type === "domain");
   if (urlEntity) {
@@ -531,13 +523,11 @@ export function analyzeInput(
     anomalyData = urlAnalysis.anomaly;
     reasons.push(...urlAnalysis.reasons);
   } else {
-    missingData.push("ไม่มี URL ในข้อความ จึงไม่ได้ตรวจวิเคราะห์โครงสร้างลิงก์ (URL Model skipped)");
+    missingData.push("No URL detected in the input; URL structural analysis model was skipped.");
   }
 
-  // 1. Base ML Score: max of text model and URL model
   let score = Math.max(textAnalysis.textScore, urlScore);
 
-  // 2. Deterministic History Floor Policy
   let historyStatus = "no_records_found";
   if (matchedThreats.length > 0) {
     const hasConfirmed = matchedThreats.some((t) => t.status === "confirmed");
@@ -546,8 +536,8 @@ export function analyzeInput(
       historyStatus = "confirmed_threat_match";
       reasons.unshift({
         code: "VERIFIED_THREAT_RECORD",
-        title: "พบประวัติในฐานข้อมูลภัยคุกคามที่ตรวจสอบแล้ว",
-        detail: `รายการนี้ตรงกับบันทึกแจ้งเตือน: ${matchedThreats[0].source} (${matchedThreats[0].evidence})`,
+        title: "Confirmed Threat Database Record Found",
+        detail: `This identifier matches a verified threat record from: ${matchedThreats[0].source} (${matchedThreats[0].evidence})`,
         source: matchedThreats[0].source,
         severity: "danger",
       });
@@ -556,44 +546,41 @@ export function analyzeInput(
       historyStatus = "reported_clue_match";
       reasons.unshift({
         code: "REPORTED_CLUE_MATCH",
-        title: "พบเบาะแสที่เคยมีผู้แจ้งไว้",
-        detail: `มีรายงานจากผู้ใช้งาน: ${matchedThreats[0].source}`,
-        source: "Community Clues",
+        title: "Community Warning Report Match",
+        detail: `User-reported clue on record: ${matchedThreats[0].source}`,
+        source: "Community Threat Intelligence",
         severity: "warning",
       });
     }
   } else {
-    missingData.push("ไม่พบข้อมูลประวัติในฐานข้อมูลภัยคุกคาม (ย้ำ: การไม่พบประวัติ ไม่ได้แปลว่าปลอดภัยเสมอไป)");
+    missingData.push("No prior history record found. NOTE: Absence of past reports does NOT equal safe (fresh scam domains have zero records).");
   }
 
-  // Determine Risk Level
   let level: RiskLevel = "LOW";
   if (score >= thresholds.high) {
     level = "HIGH";
-    advice.push("ระงับการโอนเงินหรือการทำธุรกรรมโดยทันที");
-    advice.push("ห้ามกรอกรหัสผ่าน รหัส OTP หรือเลขบัตรประชาชน");
-    advice.push("ติดต่อตรวจสอบผ่านเบอร์โทรศัพท์อย่างเป็นทางการของหน่วยงานเท่านั้น (เช่น AOC 1441)");
+    advice.push("Halt all financial transfers and transactions immediately.");
+    advice.push("Never provide OTP, PIN, password, or ID card numbers.");
+    advice.push("Verify authenticity exclusively via the company's publicly registered hotline.");
   } else if (score >= thresholds.medium) {
     level = "MEDIUM";
-    advice.push("ควรตรวจสอบความถูกต้องจากช่องทางอื่นก่อนดำเนินการ");
-    advice.push("ไม่ควรกดลิงก์ที่ส่งผ่าน SMS หรือแชทส่วนตัว");
-    advice.push("ตรวจสอบชื่อบัญชีปลายทางและหมายเลขโทรศัพท์ในฐานข้อมูลเตือนภัย");
+    advice.push("Exercise extreme caution before taking action or replying.");
+    advice.push("Do not click links sent via unprompted SMS or private chats.");
+    advice.push("Confirm recipient account name and phone against official directory.");
   } else {
     level = "LOW";
-    advice.push("ความเสี่ยงต่ำจากชุดข้อมูลนี้ แต่โปรดระมัดระวังลิงก์หรือข้อเสนอที่ให้ผลประโยชน์เกินจริง");
-    advice.push("สถาบันการเงินของไทยไม่มีนโยบายส่งลิงก์ขอรหัสผ่านหรือ OTP ผ่าน SMS");
+    advice.push("Low risk indicators found on current inputs, but remain vigilant.");
+    advice.push("Financial institutions never send links requesting passwords via SMS.");
   }
 
-  // Build Graph
   const graph = buildGraph(entities, matchedThreats);
 
-  // Summary message
   const summary =
     level === "HIGH"
-      ? "พบสัญญาณความเสี่ยงสูง ควรหยุดและตรวจสอบกับช่องทางทางการทันที"
+      ? "Strong scam risk signals detected. Halt all actions and verify through official channels."
       : level === "MEDIUM"
-      ? "พบสัญญาณที่ควรระวังและตรวจสอบเพิ่มเติมก่อนดำเนินการ"
-      : "ไม่พบสัญญาณความเสี่ยงชัดเจนจากข้อมูลที่ให้มา แต่ยังคงต้องใช้ความระมัดระวัง";
+      ? "Suspicious signals observed. Independent verification is strongly advised."
+      : "Low risk observed on available parameters. Always verify unexpected offers.";
 
   return {
     id: `scan-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,

@@ -23,21 +23,21 @@ export function ShapMeters({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#10203A] overflow-hidden shadow-sm">
+    <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#10203A] overflow-hidden shadow-xs">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-5 sm:p-6 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors text-left"
+        className="w-full p-5 sm:p-6 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors text-left cursor-pointer"
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 flex items-center justify-center shrink-0">
             <Cpu className="w-5 h-5" />
           </div>
           <div>
             <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-              ข้อมูลเทคนิค & ค่าคุณลักษณะ (Model Interpretability & SHAP)
+              Model Interpretability & SHAP Feature Importance
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              ค่า SHAP log-odds, Anomaly Isolation Forest และการเปรียบเทียบเชิงความหมาย
+              Inspect Tree SHAP log-odds contributions, URL structural anomaly score, and semantic template embeddings
             </p>
           </div>
         </div>
@@ -47,14 +47,14 @@ export function ShapMeters({
       </button>
 
       {isOpen && (
-        <div className="p-6 pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-6">
-          {/* Model info banner */}
-          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 text-xs">
+        <div className="p-6 pt-2 border-t border-slate-100 dark:border-slate-800 space-y-6">
+          {/* Model Info Banner */}
+          <div className="flex flex-wrap items-center justify-between gap-2 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">Model Artifact:</span>
-              <span className="font-mono text-purple-600 dark:text-purple-400">{modelVersion}</span>
+              <span className="font-semibold text-slate-600 dark:text-slate-300">Model Artifact:</span>
+              <span className="font-mono text-purple-600 dark:text-purple-400 font-bold">{modelVersion}</span>
             </div>
-            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-400 text-[10px] font-bold">
               ZERO-FETCH COMPLIANT
             </span>
           </div>
@@ -63,23 +63,23 @@ export function ShapMeters({
           <div className="space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-blue-500" />
+                <Activity className="w-3.5 h-3.5 text-blue-600" />
                 <span>Tree SHAP Feature Contributions (Log-Odds Impact)</span>
               </span>
-              <span className="text-[11px] text-slate-400">Higher = Greater Scam Contribution</span>
+              <span className="text-[11px] text-slate-400 font-medium">Higher = Greater Risk Weight</span>
             </div>
 
             {contributions.length > 0 ? (
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {contributions.map((c, idx) => {
                   const widthPercent = Math.min(100, (c.value / 2.5) * 100);
                   return (
-                    <div key={idx} className="space-y-1">
+                    <div key={idx} className="space-y-1.5">
                       <div className="flex justify-between text-xs">
                         <span className="text-slate-700 dark:text-slate-300 font-medium">
                           {c.feature}
                         </span>
-                        <span className="font-mono text-xs font-bold text-red-500">
+                        <span className="font-mono text-xs font-bold text-red-600">
                           +{c.value.toFixed(2)} {c.unit}
                         </span>
                       </div>
@@ -95,27 +95,27 @@ export function ShapMeters({
               </div>
             ) : (
               <p className="text-xs text-slate-500 italic">
-                ไม่มีคุณลักษณะของ URL ที่ส่งผลต่อคะแนน (ตรวจเฉพาะโมเดลข้อความ)
+                No lexical URL features influenced this score (Text-only model evaluation).
               </p>
             )}
           </div>
 
           {/* Anomaly Detection Isolation Forest */}
           {anomaly && (
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div>
                 <div className="text-xs font-bold text-slate-900 dark:text-white">
                   URL Anomaly Score (Isolation Forest)
                 </div>
                 <div className="text-[11px] text-slate-500 mt-0.5">
-                  ความผิดปกติทางโครงสร้างเทียบกับเว็บไซต์มาตรฐาน: {anomaly.baseline}
+                  Structural deviation compared to standard legitimate web baselines: {anomaly.baseline}
                 </div>
               </div>
               <div className="text-right">
-                <span className={`text-base font-black font-mono ${anomaly.is_anomaly ? "text-amber-500" : "text-emerald-500"}`}>
+                <span className={`text-base font-black font-mono ${anomaly.is_anomaly ? "text-amber-600" : "text-emerald-600"}`}>
                   {anomaly.score.toFixed(2)}
                 </span>
-                <span className="text-[10px] text-slate-400 block">/ 1.00</span>
+                <span className="text-[10px] text-slate-400 block font-bold">/ 1.00</span>
               </div>
             </div>
           )}
@@ -124,17 +124,17 @@ export function ShapMeters({
           {similarExamples.length > 0 && (
             <div className="space-y-2.5">
               <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-                <span>ตัวอย่างแคมเปญในอดีตที่มีความใกล้เคียง (Semantic Match)</span>
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Historical Campaign Template Matches (Dense Vector Cosine Similarity)</span>
               </span>
               <div className="space-y-2">
                 {similarExamples.map((ex, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-xs space-y-1"
+                    className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs space-y-1"
                   >
                     <div className="flex justify-between items-center text-slate-500 text-[11px]">
-                      <span>แหล่งที่มา: {ex.source}</span>
+                      <span>Source: {ex.source}</span>
                       <span className="font-bold text-blue-600 dark:text-blue-400 font-mono">
                         {(ex.similarity * 100).toFixed(1)}% match
                       </span>

@@ -15,11 +15,9 @@ import {
   Flag,
   ThumbsUp,
   ThumbsDown,
-  RotateCcw,
   Check,
   Shield,
   Clock,
-  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -32,7 +30,6 @@ function AnalyzeContent() {
   const [copyNotice, setCopyNotice] = useState(false);
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
 
-  // Check if viewing from history
   useEffect(() => {
     if (historyId) {
       const history = storage.getHistory();
@@ -49,7 +46,6 @@ function AnalyzeContent() {
     setIsSaved(false);
     setFeedback(null);
 
-    // If safe low risk, shoot gentle celebratory confetti
     if (result.level === "LOW") {
       try {
         confetti({
@@ -62,7 +58,6 @@ function AnalyzeContent() {
       }
     }
 
-    // Scroll to results
     window.scrollTo({ top: 320, behavior: "smooth" });
   };
 
@@ -81,38 +76,38 @@ function AnalyzeContent() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-8 animate-in fade-in duration-200">
       {/* Header */}
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold">
-          <Shield className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800 text-xs font-bold">
+          <Shield className="w-3.5 h-3.5 text-blue-600" />
           <span>Multi-Modal Scam Detection Engine</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-          ตรวจสอบความเสี่ยงฟิชชิ่งและมิจฉาชีพ (Risk Scanner)
+          Scan & Verify Suspicious Content (Risk Checker)
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-          วิเคราะห์ข้อความ, ลิงก์, สกรีนช็อตแชท หรือ QR Code ด้วยระบบ Zero-Fetch และการถ่วงน้ำหนักตามหลักฐานจริง
+          Analyze suspicious SMS messages, URLs, screenshot chat captures, or QR codes with Zero-Fetch protection and explainable AI models.
         </p>
       </div>
 
-      {/* Unified Input Scanner Form */}
+      {/* Input Scanner Form */}
       <ScanForm onAnalysisComplete={handleAnalysisComplete} />
 
       {/* Analysis Result View */}
       {currentAnalysis && (
-        <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800 animate-in slide-in-from-bottom duration-300">
+        <div className="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800 animate-in slide-in-from-bottom duration-200">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <span>ผลการตรวจวิเคราะห์ความเสี่ยง</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full font-mono bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                <span>Evaluation Results & Evidence Summary</span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-mono bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800">
                   ID: {currentAnalysis.id.slice(0, 14)}
                 </span>
               </h2>
               <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
                 <Clock className="w-3.5 h-3.5" />
-                <span>ตรวจสอบเมื่อ: {new Date(currentAnalysis.checked_at).toLocaleTimeString("th-TH")}</span>
+                <span>Checked at: {new Date(currentAnalysis.checked_at).toLocaleTimeString("en-US")}</span>
               </p>
             </div>
 
@@ -121,30 +116,30 @@ function AnalyzeContent() {
               <button
                 onClick={handleSave}
                 disabled={isSaved}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold border transition-all ${
                   isSaved
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-400"
+                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50"
                 }`}
               >
-                {isSaved ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
-                <span>{isSaved ? "บันทึกในประวัติแล้ว" : "บันทึกในประวัติ"}</span>
+                {isSaved ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Bookmark className="w-3.5 h-3.5" />}
+                <span>{isSaved ? "Saved to History" : "Save Record"}</span>
               </button>
 
               <button
                 onClick={handleShare}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition-colors shadow-2xs"
               >
-                <Share2 className="w-3.5 h-3.5 text-blue-500" />
-                <span>{copyNotice ? "คัดลอกลิงก์แล้ว!" : "แชร์รายงาน"}</span>
+                <Share2 className="w-3.5 h-3.5 text-blue-600" />
+                <span>{copyNotice ? "Link Copied!" : "Share Masked Report"}</span>
               </button>
 
               <Link
                 href={`/reports?prefill=${encodeURIComponent(currentAnalysis.raw_input || "")}`}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold border border-red-200 bg-red-50 text-red-700 dark:bg-red-950/40 dark:border-red-800 dark:text-red-400 hover:bg-red-100 transition-colors"
               >
                 <Flag className="w-3.5 h-3.5" />
-                <span>แจ้งเบาะแสสู่ชุมชน</span>
+                <span>Submit as Community Clue</span>
               </Link>
             </div>
           </div>
@@ -152,7 +147,7 @@ function AnalyzeContent() {
           {/* 1. Score Radial Gauge */}
           <ScoreGauge score={currentAnalysis.score} level={currentAnalysis.level} />
 
-          {/* 2. Evidence Grounding & Entities */}
+          {/* 2. Evidence Grounding & Extracted Entities */}
           <EvidenceCard
             reasons={currentAnalysis.reasons}
             missingData={currentAnalysis.missing_data}
@@ -160,7 +155,7 @@ function AnalyzeContent() {
             entities={currentAnalysis.entities}
           />
 
-          {/* 3. Technical Interpretability & SHAP Meters */}
+          {/* 3. Interpretability & SHAP Meters */}
           <ShapMeters
             contributions={currentAnalysis.contributions}
             anomaly={currentAnalysis.anomaly}
@@ -168,20 +163,20 @@ function AnalyzeContent() {
             modelVersion={currentAnalysis.model.version}
           />
 
-          {/* Feedback Section */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#10203A] border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-slate-600 dark:text-slate-300">
-              ผลการประเมินนี้ถูกต้องและเป็นประโยชน์สำหรับคุณหรือไม่?
+          {/* Feedback Bar */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-[#10203A] border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs shadow-xs">
+            <span className="text-slate-600 dark:text-slate-300 font-medium">
+              Was this risk assessment accurate and helpful to you?
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setFeedback("up")}
                 className={`p-2 rounded-xl border transition-colors ${
                   feedback === "up"
-                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-600"
+                    ? "bg-emerald-50 border-emerald-300 text-emerald-700"
                     : "border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600"
                 }`}
-                title="เป็นประโยชน์"
+                title="Helpful and accurate"
               >
                 <ThumbsUp className="w-4 h-4" />
               </button>
@@ -189,10 +184,10 @@ function AnalyzeContent() {
                 onClick={() => setFeedback("down")}
                 className={`p-2 rounded-xl border transition-colors ${
                   feedback === "down"
-                    ? "bg-red-500/20 border-red-500 text-red-600"
+                    ? "bg-red-50 border-red-300 text-red-700"
                     : "border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600"
                 }`}
-                title="ยังไม่ตรงกับความเป็นจริง"
+                title="Needs improvement"
               >
                 <ThumbsDown className="w-4 h-4" />
               </button>
