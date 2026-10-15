@@ -124,6 +124,17 @@ export function parseGeminiJson(rawText: string): ScamAnalysis {
   };
 }
 
+function getCandidateModels(): string[] {
+  const configured = (process.env.GEMINI_MODEL || "").trim();
+  const defaults = [
+    "gemini-3.5-flash-lite",
+    "gemini-3.5-flash",
+    "gemini-3.8-flash",
+    "gemini-flash-latest",
+  ];
+  return Array.from(new Set([configured, ...defaults].filter(Boolean)));
+}
+
 export async function analyzeScreenshotWithGemini(
   imageBuffer: Buffer,
   mimeType: string
@@ -133,41 +144,49 @@ export async function analyzeScreenshotWithGemini(
     throw new Error("GEMINI_API_KEY is not configured.");
   }
 
-  const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
   const ai = new GoogleGenAI({ apiKey });
-
   const base64Data = imageBuffer.toString("base64");
+  const modelsToTry = getCandidateModels();
 
-  const response = await ai.models.generateContent({
-    model: modelName,
-    contents: [
-      {
-        role: "user",
-        parts: [
+  let lastError: unknown = null;
+
+  for (const modelName of modelsToTry) {
+    try {
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents: [
           {
-            inlineData: {
-              mimeType,
-              data: base64Data,
-            },
-          },
-          {
-            text: "Analyze this screenshot for scams, phishing, fake alerts, credential harvesting, or social engineering. Identify exact readable evidence quotes, explain the warning signs, assign a risk percentage from 0 to 100, and recommend next steps.",
+            role: "user",
+            parts: [
+              {
+                inlineData: {
+                  mimeType,
+                  data: base64Data,
+                },
+              },
+              {
+                text: "Analyze this screenshot for scams, phishing, fake alerts, credential harvesting, or social engineering. Identify exact readable evidence quotes, explain the warning signs, assign a risk percentage from 0 to 100, and recommend next steps.",
+              },
+            ],
           },
         ],
-      },
-    ],
-    config: {
-      systemInstruction: GEMINI_SYSTEM_INSTRUCTION,
-      responseMimeType: "application/json",
-    },
-  });
+        config: {
+          systemInstruction: GEMINI_SYSTEM_INSTRUCTION,
+          responseMimeType: "application/json",
+        },
+      });
 
-  const responseText = response.text || "";
-  if (!responseText) {
-    throw new Error("Empty response received from Gemini.");
+      const responseText = response.text || "";
+      if (responseText) {
+        return parseGeminiJson(responseText);
+      }
+    } catch (err: unknown) {
+      lastError = err;
+      console.warn(`Model ${modelName} call failed, trying fallback:`, err instanceof Error ? err.message : err);
+    }
   }
 
-  return parseGeminiJson(responseText);
+  throw lastError || new Error("All Gemini models were unavailable. Please try again shortly.");
 }
 
 export async function analyzeTextWithGemini(
@@ -178,31 +197,40 @@ export async function analyzeTextWithGemini(
     throw new Error("GEMINI_API_KEY is not configured.");
   }
 
-  const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
   const ai = new GoogleGenAI({ apiKey });
+  const modelsToTry = getCandidateModels();
 
-  const response = await ai.models.generateContent({
-    model: modelName,
-    contents: [
-      {
-        role: "user",
-        parts: [
+  let lastError: unknown = null;
+
+  for (const modelName of modelsToTry) {
+    try {
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents: [
           {
-            text: `Analyze the following message/link for scam risks, impersonation, or credential theft:\n\n"""\n${text}\n"""`,
+            role: "user",
+            parts: [
+              {
+                text: `Analyze the following message/link for scam risks, impersonation, or credential theft:\n\n"""\n${text}\n"""`,
+              },
+            ],
           },
         ],
-      },
-    ],
-    config: {
-      systemInstruction: GEMINI_SYSTEM_INSTRUCTION,
-      responseMimeType: "application/json",
-    },
-  });
+        config: {
+          systemInstruction: GEMINI_SYSTEM_INSTRUCTION,
+          responseMimeType: "application/json",
+        },
+      });
 
-  const responseText = response.text || "";
-  if (!responseText) {
-    throw new Error("Empty response received from Gemini.");
+      const responseText = response.text || "";
+      if (responseText) {
+        return parseGeminiJson(responseText);
+      }
+    } catch (err: unknown) {
+      lastError = err;
+      console.warn(`Model ${modelName} call failed, trying fallback:`, err instanceof Error ? err.message : err);
+    }
   }
 
-  return parseGeminiJson(responseText);
+  throw lastError || new Error("All Gemini models were unavailable. Please try again shortly.");
 }
