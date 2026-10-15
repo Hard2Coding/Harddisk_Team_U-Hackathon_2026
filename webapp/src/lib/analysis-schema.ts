@@ -20,6 +20,7 @@ export type AnalysisSource = "gemini" | "rules" | "demo";
 
 export interface ScamAnalysis {
   riskLevel: RiskLevel;
+  riskScore: number; // Estimated scam likelihood percentage (0-100)
   summary: string;
   indicators: RiskIndicatorItem[];
   recommendedActions: string[];
@@ -52,7 +53,7 @@ export const RISK_COPY: Record<RiskLevel, { label: string; hint: string }> = {
 /** Plain-text report for the "Copy report" action. */
 export function formatReport(a: ScamAnalysis): string {
   const lines = [
-    `ScamLens report — ${RISK_COPY[a.riskLevel].label}`,
+    `ScamLens report — ${RISK_COPY[a.riskLevel].label} (${a.riskScore}% risk score)`,
     "",
     a.summary,
   ];

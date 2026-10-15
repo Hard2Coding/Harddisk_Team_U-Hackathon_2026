@@ -44,6 +44,7 @@ export function analyzeTextWithRules(input: string, kind: "text" | "url"): ScamA
   if (text.length < 6) {
     return {
       riskLevel: "uncertain",
+      riskScore: 20,
       summary: "There is not enough text to assess. Paste the full message or link.",
       indicators: [],
       recommendedActions: ["Paste the complete message, including any links or phone numbers."],
@@ -54,6 +55,7 @@ export function analyzeTextWithRules(input: string, kind: "text" | "url"): ScamA
 
   const a = analyzeInput(text, kind);
   const riskLevel = LEVEL_MAP[a.level];
+  const riskScore = Math.min(100, Math.max(5, Math.round(a.score ?? (riskLevel === "high" ? 85 : riskLevel === "medium" ? 55 : 15))));
 
   const summary =
     riskLevel === "high"
@@ -64,6 +66,7 @@ export function analyzeTextWithRules(input: string, kind: "text" | "url"): ScamA
 
   return {
     riskLevel,
+    riskScore,
     summary,
     indicators: a.reasons.slice(0, MAX_INDICATORS).map((r) => ({
       type: r.code.toLowerCase(),

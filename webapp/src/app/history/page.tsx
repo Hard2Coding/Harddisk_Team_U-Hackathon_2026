@@ -95,7 +95,7 @@ export default function HistoryPage() {
                     <span className="block text-sm font-medium truncate">{item.label}</span>
                     <span className="block text-xs text-muted mt-0.5">{dateFmt.format(new Date(item.createdAt))}</span>
                   </span>
-                  <RiskBadge level={item.analysis.riskLevel} size="sm" />
+                  <RiskBadge level={item.analysis.riskLevel} score={item.analysis.riskScore} size="sm" />
                   <ChevronRight className="w-4 h-4 text-subtle shrink-0" />
                 </button>
                 <button

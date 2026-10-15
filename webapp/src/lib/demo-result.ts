@@ -7,6 +7,7 @@ import type { ScamAnalysis } from "./analysis-schema";
  */
 export const DEMO_ANALYSIS: ScamAnalysis = {
   riskLevel: "high",
+  riskScore: 92,
   summary:
     "The message pressures you to act today and asks for a one-time password through an unfamiliar link.",
   indicators: [
