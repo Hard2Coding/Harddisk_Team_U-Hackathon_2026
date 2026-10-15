@@ -28,35 +28,56 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 bg-canvas/85 backdrop-blur-md border-b border-line">
-      <div className="mx-auto max-w-5xl px-4 sm:px-5 h-16 flex items-center justify-between gap-3">
+      <div className="mx-auto max-w-5xl px-3 sm:px-5 h-16 flex items-center justify-between gap-2 sm:gap-4">
         <Logo />
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          <nav aria-label="Main" className="hidden sm:flex items-center gap-1">
-            {LINKS.map((l) => {
-              const active = pathname === l.href;
-              return (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  aria-current={active ? "page" : undefined}
-                  className={cn(
-                    "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    active ? "bg-soft text-ink font-semibold" : "text-muted hover:text-ink hover:bg-soft",
-                  )}
-                >
-                  {l.label}
-                </Link>
-              );
-            })}
-          </nav>
+        {/* Center / Desktop Links (visible on md screens and up) */}
+        <nav aria-label="Main" className="hidden md:flex items-center gap-0.5 lg:gap-1">
+          {LINKS.map((l) => {
+            const active = pathname === l.href;
+            const isPricing = l.href === "/pricing";
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "px-2.5 py-1.5 lg:px-3 lg:py-2 rounded-lg text-xs lg:text-sm font-medium transition-colors whitespace-nowrap",
+                  active
+                    ? "bg-soft text-ink font-semibold"
+                    : isPricing
+                    ? "text-amber-700 hover:text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 font-semibold"
+                    : "text-muted hover:text-ink hover:bg-soft",
+                )}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Right Header Actions */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Header Pricing Button on smaller screens (< md) */}
+          <Link
+            href="/pricing"
+            className={cn(
+              "flex md:hidden items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold border transition-all",
+              pathname === "/pricing"
+                ? "bg-amber-500 text-white border-amber-600 shadow-xs"
+                : "bg-amber-500/10 text-amber-700 border-amber-500/30 hover:bg-amber-500/15 dark:text-amber-300"
+            )}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>Pricing</span>
+          </Link>
 
           <UserProfileMenu />
         </div>
       </div>
 
-      {/* Mobile: always-visible tab row */}
-      <nav aria-label="Main mobile" className="sm:hidden border-t border-line bg-canvas">
+      {/* Mobile: always-visible tab row (visible below md) */}
+      <nav aria-label="Main mobile" className="md:hidden border-t border-line bg-canvas">
         <div className="grid grid-cols-6">
           {LINKS.map((l) => {
             const active = pathname === l.href;
@@ -72,7 +93,9 @@ export function Navbar() {
                 )}
               >
                 <Icon className="w-4 h-4" strokeWidth={active ? 2.3 : 1.8} />
-                <span className="truncate max-w-full">{l.label === "Account Checker" ? "Accounts" : l.label === "Safety guide" ? "Guide" : l.label}</span>
+                <span className="truncate max-w-full">
+                  {l.label === "Account Checker" ? "Accounts" : l.label === "Safety guide" ? "Guide" : l.label}
+                </span>
               </Link>
             );
           })}
