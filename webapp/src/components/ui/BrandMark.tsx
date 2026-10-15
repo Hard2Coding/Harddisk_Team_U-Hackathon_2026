@@ -20,7 +20,7 @@ export function BrandMark({ size = "md", showText = true, className = "" }: Bran
 
   return (
     <Link href="/" className={`inline-flex items-center gap-3 group ${className}`}>
-      <div className="relative shrink-0 rounded-xl overflow-hidden p-0.5 bg-gradient-to-tr from-blue-600 via-purple-600 to-cyan-400 shadow-md group-hover:shadow-blue-500/25 transition-all duration-300">
+      <div className="relative shrink-0 rounded-xl overflow-hidden p-0.5 bg-linear-to-tr from-blue-600 via-purple-600 to-cyan-400 shadow-md group-hover:shadow-blue-500/25 transition-all duration-300">
         <div className="rounded-[10px] overflow-hidden bg-slate-950 flex items-center justify-center">
           <Image
             src="/brand-logo.png"

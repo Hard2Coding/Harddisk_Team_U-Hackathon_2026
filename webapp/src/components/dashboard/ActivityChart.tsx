@@ -75,7 +75,7 @@ export function ActivityChart() {
               onClick={() => setSelectedDay(d)}
               className="flex-1 flex flex-col items-center gap-2 cursor-pointer group"
             >
-              <div className="w-full max-w-[42px] flex flex-col justify-end h-32 sm:h-40 rounded-t-xl overflow-hidden bg-slate-100 dark:bg-slate-900 transition-all duration-150 group-hover:scale-105">
+              <div className="w-full max-w-10.5 flex flex-col justify-end h-32 sm:h-40 rounded-t-xl overflow-hidden bg-slate-100 dark:bg-slate-900 transition-all duration-150 group-hover:scale-105">
                 <div
                   className={`w-full rounded-t-xl flex flex-col justify-end transition-all duration-300 ${
                     isSelected ? "ring-2 ring-blue-500" : ""

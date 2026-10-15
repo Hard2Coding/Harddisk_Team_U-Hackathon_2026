@@ -85,7 +85,7 @@ export function ShapMeters({
                       </div>
                       <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-amber-500 to-red-500 rounded-full transition-all duration-700"
+                          className="h-full bg-linear-to-r from-amber-500 to-red-500 rounded-full transition-all duration-700"
                           style={{ width: `${widthPercent}%` }}
                         />
                       </div>

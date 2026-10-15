@@ -125,7 +125,7 @@ export default function HomePage() {
                 className="group p-6 rounded-3xl bg-white dark:bg-[#10203A] border border-slate-200 dark:border-slate-800 hover:border-blue-500/60 hover:shadow-md transition-all duration-150 flex flex-col justify-between space-y-4"
               >
                 <div className="flex items-center justify-between">
-                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${s.color} text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform`}>
+                  <div className={`w-12 h-12 rounded-2xl bg-linear-to-tr ${s.color} text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform`}>
                     <Icon className="w-6 h-6" />
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
