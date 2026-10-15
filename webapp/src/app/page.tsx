@@ -1,17 +1,33 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Loader2, ScanSearch, Upload, ListChecks, ShieldQuestion } from "lucide-react";
+import Link from "next/link";
+import {
+  Loader2,
+  ScanSearch,
+  Upload,
+  ListChecks,
+  ShieldQuestion,
+  Crown,
+  ArrowRight,
+} from "lucide-react";
 import { ScreenshotUploader } from "@/components/ScreenshotUploader";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import type { ScamAnalysis } from "@/lib/analysis-schema";
 import { addHistory } from "@/lib/history";
+import { useUserProfile, incrementChecksUsed } from "@/lib/userProfile";
 
 const EXAMPLE_PATH = "/examples/sample-suspicious-message.png";
 const TIMEOUT_MS = 45_000;
 
 export default function HomePage() {
+  const profile = useUserProfile();
+  const isPremium = profile.tier === "premium";
+  const checksLeft = isPremium
+    ? Infinity
+    : Math.max(0, profile.dailyScreenshotLimit - profile.checksUsedToday);
+
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,6 +64,14 @@ export default function HomePage() {
 
   const analyze = async () => {
     if (!file || loading) return;
+
+    if (!isPremium && checksLeft <= 0) {
+      setError(
+        "You have reached your 3 free screenshot checks for today! Upgrade to Premium ($1.99/mo) or switch to Demo User in your profile menu for unlimited checks.",
+      );
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setResult(null);
@@ -65,6 +89,7 @@ export default function HomePage() {
       const analysis = data as ScamAnalysis;
       setResult(analysis);
       addHistory({ kind: "screenshot", label: file.name, analysis });
+      incrementChecksUsed();
       requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     } catch (e) {
       setError(
@@ -92,6 +117,36 @@ export default function HomePage() {
 
       {/* Upload + analyze */}
       <section aria-label="Upload screenshot" className="mx-auto max-w-2xl space-y-4">
+        {/* Tier Quota Status */}
+        {!isPremium ? (
+          <div className="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-surface border border-line text-xs shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span className="text-muted">
+                <strong className="text-ink font-semibold">Free Tier:</strong>{" "}
+                {checksLeft} of {profile.dailyScreenshotLimit} checks left today
+              </span>
+            </div>
+            <Link
+              href="/pricing"
+              className="text-xs font-semibold text-ink hover:underline inline-flex items-center gap-1 group"
+            >
+              <span>Unlimited for $1.99/mo</span>
+              <ArrowRight className="w-3.5 h-3.5 text-muted group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between px-4 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 shadow-2xs">
+            <span className="flex items-center gap-1.5 font-medium">
+              <Crown className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>Demo User (Premium Active) — Unlimited screenshot checks enabled</span>
+            </span>
+            <Link href="/pricing" className="font-semibold underline text-[11px] shrink-0">
+              Plan info
+            </Link>
+          </div>
+        )}
+
         <ScreenshotUploader
           file={file}
           previewUrl={previewUrl}

@@ -203,9 +203,9 @@ export default function BankCheckPage() {
           <Landmark className="w-3.5 h-3.5 text-ink" />
           <span>Scam Account Intelligence Database</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Bank Account Check</h1>
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Account Checker</h1>
         <p className="mt-3 text-muted max-w-xl mx-auto leading-relaxed">
-          Verify recipient account numbers, names, or banks against reported scam accounts before you transfer funds.
+          Verify recipient bank account numbers, names, or scam clues against reported accounts before you transfer funds.
         </p>
       </section>
 
