@@ -59,13 +59,13 @@ export function UserProfileMenu() {
           className={cn(
             "w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-white font-semibold text-[11px]",
             isPremium
-              ? "bg-gradient-to-tr from-amber-500 to-orange-400 shadow-xs"
+              ? "bg-linear-to-tr from-amber-500 to-orange-400 shadow-xs"
               : "bg-subtle/80 text-surface"
           )}
         >
           {isPremium ? <Crown className="w-3.5 h-3.5 text-white" /> : <User className="w-3.5 h-3.5 text-white" />}
         </div>
-        <span className="font-semibold hidden sm:inline-block max-w-[90px] truncate">
+        <span className="font-semibold hidden sm:inline-block max-w-22.5 truncate">
           {isPremium ? "Premium" : "Guest"}
         </span>
         <span
@@ -91,7 +91,7 @@ export function UserProfileMenu() {
                 className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs",
                   isPremium
-                    ? "bg-gradient-to-tr from-amber-500 to-orange-400"
+                    ? "bg-linear-to-tr from-amber-500 to-orange-400"
                     : "bg-subtle/80"
                 )}
               >

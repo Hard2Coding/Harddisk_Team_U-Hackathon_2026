@@ -162,7 +162,7 @@ export default function PricingPage() {
         {/* Tier 2: Premium ($1.99/mo) - Highlighted */}
         <div className="rounded-3xl border-2 border-amber-500/80 bg-surface p-7 sm:p-8 flex flex-col justify-between shadow-lg relative overflow-hidden">
           {/* Popular Tag */}
-          <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase tracking-widest flex items-center gap-1 shadow-xs">
+          <div className="absolute top-0 right-0 bg-linear-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-4 py-1 rounded-bl-xl uppercase tracking-widest flex items-center gap-1 shadow-xs">
             <Sparkles className="w-3 h-3" />
             Most Popular
           </div>
