@@ -1,0 +1,11 @@
+{
+  "name": "scamgraph-ai",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix webapp run dev",
+    "build": "npm --prefix webapp run build",
+    "start": "npm --prefix webapp run start",
+    "lint": "npm --prefix webapp run lint"
+  }
+}
