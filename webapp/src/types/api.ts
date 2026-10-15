@@ -70,13 +70,13 @@ export interface Analysis {
   reasons: Reason[];
   history: {
     status: string;
-    matches: Record<string, any>[];
+    matches: Record<string, unknown>[];
   };
   graph: GraphData;
   missing_data: string[];
   model: {
     version: string;
-    status: string | Record<string, any>;
+    status: string | Record<string, unknown>;
     dataset_is_sample: boolean;
   };
   similar_examples: SimilarExample[];

@@ -1,8 +1,27 @@
-import { Analysis, Entity, GraphData, Reason, Contribution, RiskLevel } from "@/types/api";
+import {
+  Analysis,
+  Entity,
+  GraphData,
+  GraphEdge,
+  GraphNode,
+  Reason,
+  Contribution,
+  RiskLevel,
+  SimilarExample,
+} from "@/types/api";
 import { maskIdentifier } from "./utils";
 
+export type ThreatRecord = {
+  type: string;
+  value: string;
+  status: string;
+  source: string;
+  evidence: string;
+  related: string[];
+};
+
 // Verified sample threat records
-export const SAMPLE_THREAT_RECORDS = [
+export const SAMPLE_THREAT_RECORDS: ThreatRecord[] = [
   {
     type: "url",
     value: "http://kbank-verify-otp.xyz",
@@ -287,7 +306,7 @@ export function analyzeUrlFeatures(urlStr: string): {
 export function analyzeTextPatterns(text: string): {
   textScore: number;
   reasons: Reason[];
-  similarExamples: any[];
+  similarExamples: SimilarExample[];
 } {
   let baseScore = 12; // baseline minimal low score
   const lower = text.toLowerCase();
@@ -361,7 +380,7 @@ export function analyzeTextPatterns(text: string): {
     });
   }
 
-  const similarExamples = [];
+  const similarExamples: SimilarExample[] = [];
   if (matchedCredentials.length > 0 || matchedFinancial.length > 0) {
     similarExamples.push({
       text: "Security Alert: Your online banking access is temporarily frozen. Verify your one-time code immediately at the link below to restore access.",
@@ -389,9 +408,9 @@ export function analyzeTextPatterns(text: string): {
 }
 
 // Build relational entity graph
-export function buildGraph(entities: Entity[], matchedThreats: any[]): GraphData {
-  const nodes: any[] = [];
-  const edges: any[] = [];
+export function buildGraph(entities: Entity[], matchedThreats: ThreatRecord[]): GraphData {
+  const nodes: GraphNode[] = [];
+  const edges: GraphEdge[] = [];
   const nodeSet = new Set<string>();
 
   entities.forEach((ent) => {

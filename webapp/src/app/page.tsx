@@ -1,259 +1,165 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import {
-  MessageSquare,
-  Globe,
-  Image as ImageIcon,
-  QrCode,
-  ShieldAlert,
-  History,
-  Flag,
-  ArrowRight,
-  Sparkles,
-  ExternalLink,
-} from "lucide-react";
-import { ActivityChart } from "@/components/dashboard/ActivityChart";
-import { useAuth } from "@/lib/auth";
-import { storage } from "@/lib/storage";
-import { HistoryItem } from "@/types/api";
-import { getRiskColor, formatDate } from "@/lib/utils";
+
+import { useRef, useState } from "react";
+import { Loader2, ScanSearch, Upload, ListChecks, ShieldQuestion } from "lucide-react";
+import { ScreenshotUploader } from "@/components/ScreenshotUploader";
+import { AnalysisResults } from "@/components/AnalysisResults";
+import { ErrorMessage } from "@/components/ErrorMessage";
+import type { ScamAnalysis } from "@/lib/analysis-schema";
+import { addHistory } from "@/lib/history";
+
+const EXAMPLE_PATH = "/examples/sample-suspicious-message.png";
+const TIMEOUT_MS = 45_000;
 
 export default function HomePage() {
-  const { user } = useAuth();
-  const [recentScans, setRecentScans] = useState<HistoryItem[]>([]);
-  const [stats, setStats] = useState({ total: 0, high: 0, clues: 0 });
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ScamAnalysis | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const history = storage.getHistory();
-    const reports = storage.getReports();
-    setRecentScans(history.slice(0, 5));
+  const selectFile = (f: File) => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(f);
+    setPreviewUrl(URL.createObjectURL(f));
+    setResult(null);
+    setError(null);
+  };
 
-    const highCount = history.filter((h) => h.level === "HIGH").length;
-    setStats({
-      total: history.length,
-      high: highCount,
-      clues: reports.length,
-    });
-  }, []);
+  const reset = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl(null);
+    setResult(null);
+    setError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-  const shortcuts = [
-    {
-      title: "Message / SMS",
-      desc: "Analyze SMS, chat messages, urgency lures, and OTP credential theft",
-      icon: MessageSquare,
-      color: "from-blue-600 to-indigo-600",
-      href: "/analyze?tab=text",
-    },
-    {
-      title: "Link / URL",
-      desc: "Detect phishing links, typosquatting domains, and high-risk TLDs",
-      icon: Globe,
-      color: "from-cyan-600 to-blue-600",
-      href: "/analyze?tab=url",
-    },
-    {
-      title: "Screenshot / OCR",
-      desc: "Automatically extract and inspect text from chat captures and bank slips",
-      icon: ImageIcon,
-      color: "from-purple-600 to-pink-600",
-      href: "/analyze?tab=ocr",
-    },
-    {
-      title: "QR Code",
-      desc: "Decode payment codes and disguised links safely without auto-executing",
-      icon: QrCode,
-      color: "from-emerald-600 to-teal-600",
-      href: "/analyze?tab=qr",
-    },
-  ];
+  const tryExample = async () => {
+    try {
+      const res = await fetch(EXAMPLE_PATH);
+      const blob = await res.blob();
+      selectFile(new File([blob], "example-suspicious-message.png", { type: "image/png" }));
+    } catch {
+      setError("Couldn't load the example. Please try again.");
+    }
+  };
+
+  const analyze = async () => {
+    if (!file || loading) return;
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/analyze", { method: "POST", body, signal: controller.signal });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data) {
+        throw new Error((data && data.error) || "We couldn't analyze this screenshot. Please try again.");
+      }
+      const analysis = data as ScamAnalysis;
+      setResult(analysis);
+      addHistory({ kind: "screenshot", label: file.name, analysis });
+      requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    } catch (e) {
+      setError(
+        e instanceof DOMException && e.name === "AbortError"
+          ? "This is taking too long. Check your connection and try again."
+          : e instanceof Error
+            ? e.message
+            : "Something went wrong. Please try again.",
+      );
+    } finally {
+      clearTimeout(timer);
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-200">
-      {/* Top Greeting & Tagline Hero */}
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-10 bg-white dark:bg-[#10203A] border border-slate-200 dark:border-slate-800 shadow-xs">
-        <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-bold">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>AI Risk Intelligence Platform</span>
-          </div>
+    <div className="mx-auto max-w-5xl px-5">
+      {/* Hero */}
+      <section className="pt-14 sm:pt-20 pb-10 text-center">
+        <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight">Check before you trust.</h1>
+        <p className="mt-4 text-lg text-muted max-w-xl mx-auto leading-relaxed">
+          Upload a screenshot. Understand the warning signs. Know what to do next.
+        </p>
+      </section>
 
-          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-            Hello, {user?.name || "Welcome"} 👋
-          </h1>
+      {/* Upload + analyze */}
+      <section aria-label="Upload screenshot" className="mx-auto max-w-2xl space-y-4">
+        <ScreenshotUploader
+          file={file}
+          previewUrl={previewUrl}
+          disabled={loading}
+          onSelect={selectFile}
+          onClear={reset}
+          onError={setError}
+          onTryExample={tryExample}
+        />
 
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-            Verify suspicious text messages, web links, and payment details before falling victim to fraud. Powered by explainable AI and transparent evidence grounding.
-          </p>
+        {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
 
-          <div className="pt-2 flex flex-wrap items-center gap-3">
-            <Link
-              href="/analyze"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer"
-            >
-              <span>Scan Suspicious Input</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-
-            <Link
-              href="/graph"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs sm:text-sm font-semibold transition-colors"
-            >
-              <span>Explore Knowledge Graph</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 4 Primary Scan Shortcuts */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-            Choose What to Check (Scan Modes)
-          </h2>
-          <span className="text-xs font-semibold text-slate-400">4 Detection Channels</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {shortcuts.map((s, idx) => {
-            const Icon = s.icon;
-            return (
-              <Link
-                key={idx}
-                href={s.href}
-                className="group p-6 rounded-3xl bg-white dark:bg-[#10203A] border border-slate-200 dark:border-slate-800 hover:border-blue-500/60 hover:shadow-md transition-all duration-150 flex flex-col justify-between space-y-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div className={`w-12 h-12 rounded-2xl bg-linear-to-tr ${s.color} text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform`}>
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                    {s.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                    {s.desc}
-                  </p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 3 Summary Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#10203A] border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 flex items-center justify-center shrink-0">
-            <History className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white">
-              {stats.total + 1420}
-            </div>
-            <div className="text-xs text-slate-500 font-medium">Total Risk Analyses Completed</div>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#10203A] border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400 flex items-center justify-center shrink-0">
-            <ShieldAlert className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-2xl font-black text-red-600 dark:text-red-400">
-              {stats.high + 482}
-            </div>
-            <div className="text-xs text-slate-500 font-medium">High Risk Threats Intercepted</div>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#10203A] border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 flex items-center justify-center shrink-0">
-            <Flag className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-2xl font-black text-purple-600 dark:text-purple-400">
-              {stats.clues + 28}
-            </div>
-            <div className="text-xs text-slate-500 font-medium">Community Scam Clues Recorded</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 7-Day Activity Chart */}
-      <ActivityChart />
-
-      {/* Recent Analyses Preview */}
-      <div className="bg-white dark:bg-[#10203A] rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              Recent Activity & Saved Analyses
-            </h3>
-            <p className="text-xs text-slate-500">Your scan history is privacy-masked and encrypted</p>
-          </div>
-          <Link
-            href="/history"
-            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+        {file && !result && (
+          <button
+            type="button"
+            id="analyze-screenshot"
+            onClick={analyze}
+            disabled={loading}
+            className="w-full inline-flex items-center justify-center gap-2 h-13 rounded-xl bg-ink text-white text-base font-medium hover:bg-ink/90 disabled:opacity-70 disabled:cursor-wait transition-colors"
           >
-            <span>View All Records</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" /> Analyzing screenshot…
+              </>
+            ) : (
+              <>
+                <ScanSearch className="w-5 h-5" /> Analyze screenshot
+              </>
+            )}
+          </button>
+        )}
+      </section>
 
-        {recentScans.length > 0 ? (
-          <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-            {recentScans.map((item) => {
-              const risk = getRiskColor(item.level);
-              return (
-                <div
-                  key={item.id}
-                  className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                >
-                  <div className="space-y-1 max-w-xl">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${risk.badgeBg}`}>
-                        {risk.label}
-                      </span>
-                      <span className="text-[11px] text-slate-400 uppercase font-mono font-semibold">
-                        {item.kind}
-                      </span>
-                      <span className="text-[11px] text-slate-400">
-                        • {formatDate(item.created_at)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-700 dark:text-slate-300 font-mono truncate">
-                      {item.masked_text}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-4 shrink-0">
-                    <div className="text-right">
-                      <span className="text-base font-black text-slate-900 dark:text-white">
-                        {item.score !== null ? Math.round(item.score) : "—"}
-                      </span>
-                      <span className="text-[10px] text-slate-400 block font-semibold">/ 100</span>
-                    </div>
-                    <Link
-                      href={`/analyze?historyId=${item.id}`}
-                      className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors"
-                    >
-                      Inspect Result
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="p-8 text-center text-xs text-slate-500">
-            No analyses recorded yet. Start scanning suspicious SMS or links above!
+      {/* Results */}
+      <div ref={resultRef} className="scroll-mt-24">
+        {result && (
+          <div className="mt-10">
+            <AnalysisResults analysis={result} onReset={reset} resetLabel="Analyze another" />
           </div>
         )}
       </div>
+
+      {/* How it works */}
+      {!result && (
+        <section id="how-it-works" aria-labelledby="how-heading" className="mt-20 scroll-mt-24">
+          <h2 id="how-heading" className="text-center text-sm font-medium text-muted uppercase tracking-wider">
+            How it works
+          </h2>
+          <ol className="mt-6 grid gap-4 sm:grid-cols-3">
+            {[
+              { icon: Upload, title: "Upload", text: "Add a screenshot of a message, chat, or email you’re unsure about." },
+              { icon: ShieldQuestion, title: "Review", text: "See the warning signs, with the exact words that raised concern." },
+              { icon: ListChecks, title: "Act safely", text: "Follow clear next steps to protect your money and accounts." },
+            ].map((s, i) => (
+              <li key={s.title} className="rounded-2xl border border-line bg-surface p-5">
+                <div className="flex items-center gap-3">
+                  <span className="grid place-items-center w-9 h-9 rounded-lg bg-soft">
+                    <s.icon className="w-4.5 h-4.5" strokeWidth={1.8} />
+                  </span>
+                  <span className="text-xs text-subtle font-medium">Step {i + 1}</span>
+                </div>
+                <p className="mt-4 font-medium">{s.title}</p>
+                <p className="mt-1 text-sm text-muted leading-relaxed">{s.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
     </div>
   );
 }
