@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Image as ImageIcon, MessageSquareText, History, BookOpen } from "lucide-react";
+import { Image as ImageIcon, MessageSquareText, History, BookOpen, Landmark } from "lucide-react";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/", label: "Screenshot", icon: ImageIcon },
   { href: "/check", label: "Text & link", icon: MessageSquareText },
+  { href: "/bank-check", label: "Bank Check", icon: Landmark },
   { href: "/history", label: "History", icon: History },
   { href: "/guide", label: "Safety guide", icon: BookOpen },
 ];
@@ -29,7 +30,7 @@ export function Navbar() {
                 href={l.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "px-3.5 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   active ? "bg-soft text-ink" : "text-muted hover:text-ink hover:bg-soft",
                 )}
               >
@@ -42,7 +43,7 @@ export function Navbar() {
 
       {/* Mobile: always-visible tab row (no hidden menus — easier for all ages) */}
       <nav aria-label="Main mobile" className="sm:hidden border-t border-line">
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-5">
           {LINKS.map((l) => {
             const active = pathname === l.href;
             const Icon = l.icon;

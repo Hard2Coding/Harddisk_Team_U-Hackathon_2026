@@ -1,0 +1,134 @@
+export interface ReportedBankAccount {
+  id: number;
+  accountNumber: string;
+  name: string;
+  bankCompany: string;
+  scamType: string;
+  reportsCount: number;
+  reportedDate: string;
+  status: "Blacklisted" | "Flagged Mule" | "Under Investigation";
+}
+
+// 100 Mock reported scam bank accounts across Bank A, B, C, D, E, F
+export const MOCK_BANK_ACCOUNTS: ReportedBankAccount[] = [
+  { id: 1, accountNumber: "140-2-99881-0", name: "Somchai Rattanakorn", bankCompany: "Bank A", scamType: "Fake Investment / Crypto", reportsCount: 24, reportedDate: "2026-03-14", status: "Blacklisted" },
+  { id: 2, accountNumber: "204-5-88123-1", name: "Anan Prasertkul", bankCompany: "Bank B", scamType: "Online Marketplace Fraud", reportsCount: 18, reportedDate: "2026-03-12", status: "Blacklisted" },
+  { id: 3, accountNumber: "318-9-44512-7", name: "Thanaporn Suksomboon", bankCompany: "Bank C", scamType: "Fake Loan Processing Fee", reportsCount: 31, reportedDate: "2026-03-10", status: "Blacklisted" },
+  { id: 4, accountNumber: "450-1-66782-3", name: "Nattapol Wongsuwan", bankCompany: "Bank D", scamType: "Impersonation / Police Scam", reportsCount: 42, reportedDate: "2026-03-08", status: "Blacklisted" },
+  { id: 5, accountNumber: "582-7-11234-9", name: "Kittipong Chaiyaphum", bankCompany: "Bank E", scamType: "Telegram Task Scam", reportsCount: 15, reportedDate: "2026-03-05", status: "Flagged Mule" },
+  { id: 6, accountNumber: "691-3-77890-4", name: "Siriporn Charoensuk", bankCompany: "Bank F", scamType: "Ticket Resale Fraud", reportsCount: 9, reportedDate: "2026-03-01", status: "Under Investigation" },
+  { id: 7, accountNumber: "723-8-33451-2", name: "Voravudh Thanasak", bankCompany: "Bank A", scamType: "Fake Investment / Crypto", reportsCount: 27, reportedDate: "2026-02-28", status: "Blacklisted" },
+  { id: 8, accountNumber: "834-4-99012-6", name: "Chutima Boonchalee", bankCompany: "Bank B", scamType: "Hotel Booking Impersonator", reportsCount: 12, reportedDate: "2026-02-27", status: "Flagged Mule" },
+  { id: 9, accountNumber: "945-0-55678-1", name: "Praphan Siriwattana", bankCompany: "Bank C", scamType: "Romance Scam", reportsCount: 19, reportedDate: "2026-02-25", status: "Blacklisted" },
+  { id: 10, accountNumber: "106-6-22345-8", name: "Manit Pornpradit", bankCompany: "Bank D", scamType: "Online Marketplace Fraud", reportsCount: 8, reportedDate: "2026-02-24", status: "Under Investigation" },
+  { id: 11, accountNumber: "217-2-88901-5", name: "Supattra Watcharaporn", bankCompany: "Bank E", scamType: "Fake Job Offer", reportsCount: 35, reportedDate: "2026-02-22", status: "Blacklisted" },
+  { id: 12, accountNumber: "328-8-44567-3", name: "Boonsong Ratanawong", bankCompany: "Bank F", scamType: "E-Commerce Fraud", reportsCount: 14, reportedDate: "2026-02-20", status: "Flagged Mule" },
+  { id: 13, accountNumber: "439-4-00123-9", name: "Duangjai Srikamol", bankCompany: "Bank A", scamType: "Fake Loan Deposit", reportsCount: 22, reportedDate: "2026-02-19", status: "Blacklisted" },
+  { id: 14, accountNumber: "550-0-66789-2", name: "Theerapat Suwannarat", bankCompany: "Bank B", scamType: "Identity Theft Mule", reportsCount: 47, reportedDate: "2026-02-18", status: "Blacklisted" },
+  { id: 15, accountNumber: "661-6-22341-7", name: "Phailin Wattanapanit", bankCompany: "Bank C", scamType: "Lottery Prize Scam", reportsCount: 11, reportedDate: "2026-02-16", status: "Flagged Mule" },
+  { id: 16, accountNumber: "772-2-88904-1", name: "Sakda Phongphat", bankCompany: "Bank D", scamType: "Fake Investment / Gold", reportsCount: 38, reportedDate: "2026-02-15", status: "Blacklisted" },
+  { id: 17, accountNumber: "883-8-44561-6", name: "Pattama Kerdchuen", bankCompany: "Bank E", scamType: "Online Marketplace Fraud", reportsCount: 16, reportedDate: "2026-02-14", status: "Blacklisted" },
+  { id: 18, accountNumber: "994-4-00127-0", name: "Kriengkrai Sangwong", bankCompany: "Bank F", scamType: "Delivery Fee Scam", reportsCount: 7, reportedDate: "2026-02-12", status: "Under Investigation" },
+  { id: 19, accountNumber: "115-0-66783-5", name: "Rungruedee Mongkol", bankCompany: "Bank A", scamType: "Fake Investment / Crypto", reportsCount: 29, reportedDate: "2026-02-10", status: "Blacklisted" },
+  { id: 20, accountNumber: "226-6-22349-8", name: "Charnvit Ruangrit", bankCompany: "Bank B", scamType: "Telegram Task Scam", reportsCount: 21, reportedDate: "2026-02-09", status: "Flagged Mule" },
+  { id: 21, accountNumber: "337-2-88905-2", name: "Wandee Techasit", bankCompany: "Bank C", scamType: "Online Shopping Fraud", reportsCount: 13, reportedDate: "2026-02-07", status: "Blacklisted" },
+  { id: 22, accountNumber: "448-8-44563-7", name: "Prasit Lertpanich", bankCompany: "Bank D", scamType: "Police Impersonator", reportsCount: 45, reportedDate: "2026-02-05", status: "Blacklisted" },
+  { id: 23, accountNumber: "559-4-00129-1", name: "Malai Janyawat", bankCompany: "Bank E", scamType: "Fake Loan Approval Fee", reportsCount: 26, reportedDate: "2026-02-04", status: "Blacklisted" },
+  { id: 24, accountNumber: "670-0-66785-6", name: "Sompong Thanyarat", bankCompany: "Bank F", scamType: "Pre-order Electronics Fraud", reportsCount: 17, reportedDate: "2026-02-02", status: "Flagged Mule" },
+  { id: 25, accountNumber: "781-6-22343-0", name: "Waraporn Chaidet", bankCompany: "Bank A", scamType: "Forex Trading Scam", reportsCount: 33, reportedDate: "2026-02-01", status: "Blacklisted" },
+  { id: 26, accountNumber: "892-2-88907-4", name: "Narong Khampan", bankCompany: "Bank B", scamType: "Airline Ticket Fraud", reportsCount: 10, reportedDate: "2026-01-30", status: "Under Investigation" },
+  { id: 27, accountNumber: "903-8-44569-9", name: "Pensri Thaveesup", bankCompany: "Bank C", scamType: "Online Marketplace Fraud", reportsCount: 20, reportedDate: "2026-01-29", status: "Blacklisted" },
+  { id: 28, accountNumber: "114-4-00125-3", name: "Adisorn Phrommas", bankCompany: "Bank D", scamType: "Mule Account Network", reportsCount: 52, reportedDate: "2026-01-27", status: "Blacklisted" },
+  { id: 29, accountNumber: "225-0-66781-8", name: "Ratsamee Kongsawat", bankCompany: "Bank E", scamType: "Part-time Job Scam", reportsCount: 14, reportedDate: "2026-01-26", status: "Flagged Mule" },
+  { id: 30, accountNumber: "336-6-22347-2", name: "Chirasak Pongsatorn", bankCompany: "Bank F", scamType: "Second-hand Goods Fraud", reportsCount: 8, reportedDate: "2026-01-24", status: "Under Investigation" },
+  { id: 31, accountNumber: "447-2-88903-7", name: "Niramon Saenghirun", bankCompany: "Bank A", scamType: "Fake Crypto Mining", reportsCount: 28, reportedDate: "2026-01-22", status: "Blacklisted" },
+  { id: 32, accountNumber: "558-8-44565-1", name: "Tanawat Rujipas", bankCompany: "Bank B", scamType: "Social Media Impersonation", reportsCount: 19, reportedDate: "2026-01-20", status: "Blacklisted" },
+  { id: 33, accountNumber: "669-4-00121-6", name: "Suwannee Pipitporn", bankCompany: "Bank C", scamType: "Emergency Money Transfer Scam", reportsCount: 25, reportedDate: "2026-01-19", status: "Blacklisted" },
+  { id: 34, accountNumber: "780-0-66787-0", name: "Wanchai Kasemsuk", bankCompany: "Bank D", scamType: "Customs Tax Fee Scam", reportsCount: 39, reportedDate: "2026-01-17", status: "Blacklisted" },
+  { id: 35, accountNumber: "891-6-22342-5", name: "Pimchanok Kittisuk", bankCompany: "Bank E", scamType: "Product Review Commission", reportsCount: 16, reportedDate: "2026-01-15", status: "Flagged Mule" },
+  { id: 36, accountNumber: "902-2-88908-9", name: "Thawatchai Inthara", bankCompany: "Bank F", scamType: "Concert Ticket Scam", reportsCount: 23, reportedDate: "2026-01-14", status: "Blacklisted" },
+  { id: 37, accountNumber: "113-8-44564-4", name: "Sunanta Phisuth", bankCompany: "Bank A", scamType: "Fake Investment Scheme", reportsCount: 41, reportedDate: "2026-01-12", status: "Blacklisted" },
+  { id: 38, accountNumber: "224-4-00120-8", name: "Nathee Srisuwan", bankCompany: "Bank B", scamType: "Online Camera Gear Fraud", reportsCount: 11, reportedDate: "2026-01-10", status: "Under Investigation" },
+  { id: 39, accountNumber: "335-0-66786-3", name: "Kanokwan Phancharoen", bankCompany: "Bank C", scamType: "Instant Loan Scam", reportsCount: 30, reportedDate: "2026-01-09", status: "Blacklisted" },
+  { id: 40, accountNumber: "446-6-22340-7", name: "Paitoon Decha", bankCompany: "Bank D", scamType: "High Court Official Impersonator", reportsCount: 46, reportedDate: "2026-01-07", status: "Blacklisted" },
+  { id: 41, accountNumber: "557-2-88906-2", name: "Apinya Wongamat", bankCompany: "Bank E", scamType: "Affiliate Task Fraud", reportsCount: 15, reportedDate: "2026-01-05", status: "Flagged Mule" },
+  { id: 42, accountNumber: "668-8-44562-6", name: "Chatree Ruangwong", bankCompany: "Bank F", scamType: "Apartment Rental Deposit", reportsCount: 18, reportedDate: "2026-01-04", status: "Blacklisted" },
+  { id: 43, accountNumber: "779-4-00128-1", name: "Kamonwan Boonperm", bankCompany: "Bank A", scamType: "Fake Mutual Fund", reportsCount: 34, reportedDate: "2026-01-02", status: "Blacklisted" },
+  { id: 44, accountNumber: "890-0-66784-5", name: "Veera Pholdee", bankCompany: "Bank B", scamType: "Mobile Phone Pre-order", reportsCount: 21, reportedDate: "2025-12-30", status: "Blacklisted" },
+  { id: 45, accountNumber: "901-6-22348-0", name: "Oranuch Saelim", bankCompany: "Bank C", scamType: "Package Delivery Scam", reportsCount: 9, reportedDate: "2025-12-28", status: "Under Investigation" },
+  { id: 46, accountNumber: "112-2-88902-4", name: "Sathit Charoenphon", bankCompany: "Bank D", scamType: "Cyber Police Impersonation", reportsCount: 49, reportedDate: "2025-12-26", status: "Blacklisted" },
+  { id: 47, accountNumber: "223-8-44568-9", name: "Benjamas Thipmanee", bankCompany: "Bank E", scamType: "Home Worker Commission Fraud", reportsCount: 13, reportedDate: "2025-12-24", status: "Flagged Mule" },
+  { id: 48, accountNumber: "334-4-00124-3", name: "Chusak Narkpanich", bankCompany: "Bank F", scamType: "Pet Adoption Deposit Fraud", reportsCount: 7, reportedDate: "2025-12-22", status: "Under Investigation" },
+  { id: 49, accountNumber: "445-0-66780-8", name: "Wassana Somprasong", bankCompany: "Bank A", scamType: "Fake Gold Savings Scheme", reportsCount: 37, reportedDate: "2025-12-20", status: "Blacklisted" },
+  { id: 50, accountNumber: "556-6-22346-2", name: "Surasak Boonma", bankCompany: "Bank B", scamType: "Computer Graphics Card Scam", reportsCount: 16, reportedDate: "2025-12-18", status: "Blacklisted" },
+  { id: 51, accountNumber: "667-2-88900-7", name: "Ploy Napapat", bankCompany: "Bank C", scamType: "Online Clothing Boutique Scam", reportsCount: 12, reportedDate: "2025-12-16", status: "Flagged Mule" },
+  { id: 52, accountNumber: "778-8-44566-1", name: "Narisara Thepparat", bankCompany: "Bank D", scamType: "Tax Refund Scam", reportsCount: 36, reportedDate: "2025-12-15", status: "Blacklisted" },
+  { id: 53, accountNumber: "889-4-00122-6", name: "Thongchai Wattana", bankCompany: "Bank E", scamType: "Microloan Processing Scam", reportsCount: 23, reportedDate: "2025-12-12", status: "Blacklisted" },
+  { id: 54, accountNumber: "990-0-66788-0", name: "Chompoo Arayasri", bankCompany: "Bank F", scamType: "Brand-name Bag Reseller Scam", reportsCount: 27, reportedDate: "2025-12-10", status: "Blacklisted" },
+  { id: 55, accountNumber: "101-6-22344-5", name: "Mongkol Sirisup", bankCompany: "Bank A", scamType: "Crypto Staking Pool Scam", reportsCount: 32, reportedDate: "2025-12-08", status: "Blacklisted" },
+  { id: 56, accountNumber: "212-2-88909-9", name: "Naruemon Ketkaew", bankCompany: "Bank B", scamType: "Gaming Account Marketplace Fraud", reportsCount: 15, reportedDate: "2025-12-05", status: "Flagged Mule" },
+  { id: 57, accountNumber: "323-8-44560-4", name: "Somkiat Praparat", bankCompany: "Bank C", scamType: "Vehicle Down-payment Scam", reportsCount: 44, reportedDate: "2025-12-03", status: "Blacklisted" },
+  { id: 58, accountNumber: "434-4-00126-8", name: "Kanyarat Wongchai", bankCompany: "Bank D", scamType: "Narcotics Suppression Impersonator", reportsCount: 40, reportedDate: "2025-12-01", status: "Blacklisted" },
+  { id: 59, accountNumber: "545-0-66782-3", name: "Pichit Kongkaew", bankCompany: "Bank E", scamType: "Freelance Writing Deposit Fraud", reportsCount: 10, reportedDate: "2025-11-28", status: "Under Investigation" },
+  { id: 60, accountNumber: "656-6-22348-7", name: "Sukanya Boonyarat", bankCompany: "Bank F", scamType: "Air Conditioner Repair Deposit", reportsCount: 8, reportedDate: "2025-11-25", status: "Under Investigation" },
+  { id: 61, accountNumber: "767-2-88903-2", name: "Danai Saengdao", bankCompany: "Bank A", scamType: "Binary Options Scam", reportsCount: 30, reportedDate: "2025-11-22", status: "Blacklisted" },
+  { id: 62, accountNumber: "878-8-44567-6", name: "Uraiwan Sriboon", bankCompany: "Bank B", scamType: "Gold Necklace Installment Scam", reportsCount: 22, reportedDate: "2025-11-20", status: "Blacklisted" },
+  { id: 63, accountNumber: "989-4-00121-1", name: "Yuttana Phothong", bankCompany: "Bank C", scamType: "Fast Approval Loan Fraud", reportsCount: 28, reportedDate: "2025-11-18", status: "Blacklisted" },
+  { id: 64, accountNumber: "102-0-66785-5", name: "Phatcharee Wannasri", bankCompany: "Bank D", scamType: "Anti-Money Laundering Imposter", reportsCount: 51, reportedDate: "2025-11-15", status: "Blacklisted" },
+  { id: 65, accountNumber: "213-6-22341-0", name: "Kornkamol Intasit", bankCompany: "Bank E", scamType: "Social Media Follower Booster Fraud", reportsCount: 11, reportedDate: "2025-11-12", status: "Flagged Mule" },
+  { id: 66, accountNumber: "324-2-88905-4", name: "Anuchit Lertsakul", bankCompany: "Bank F", scamType: "Sneaker Collectibles Scam", reportsCount: 19, reportedDate: "2025-11-10", status: "Blacklisted" },
+  { id: 67, accountNumber: "435-8-44569-8", name: "Pranee Chantharat", bankCompany: "Bank A", scamType: "Overseas Forex Investment", reportsCount: 35, reportedDate: "2025-11-08", status: "Blacklisted" },
+  { id: 68, accountNumber: "546-4-00123-3", name: "Wuttichai Somchart", bankCompany: "Bank B", scamType: "Car Rental Security Deposit Scam", reportsCount: 14, reportedDate: "2025-11-05", status: "Flagged Mule" },
+  { id: 69, accountNumber: "657-0-66787-7", name: "Jutarat Kongchana", bankCompany: "Bank C", scamType: "PromptPay Transfer Refund Phishing", reportsCount: 26, reportedDate: "2025-11-02", status: "Blacklisted" },
+  { id: 70, accountNumber: "768-6-22343-2", name: "Saharat Wongsuwan", bankCompany: "Bank D", scamType: "Central Bank Flagged Account", reportsCount: 48, reportedDate: "2025-10-30", status: "Blacklisted" },
+  { id: 71, accountNumber: "879-2-88907-6", name: "Sureeporn Boontham", bankCompany: "Bank E", scamType: "Short Video Liking Job Scam", reportsCount: 17, reportedDate: "2025-10-27", status: "Blacklisted" },
+  { id: 72, accountNumber: "980-8-44561-1", name: "Kittisak Phromdee", bankCompany: "Bank F", scamType: "Musical Instruments Fraud", reportsCount: 9, reportedDate: "2025-10-25", status: "Under Investigation" },
+  { id: 73, accountNumber: "103-4-00125-5", name: "Nantana Sriprapha", bankCompany: "Bank A", scamType: "AI Arbitrage Trading Bot Scam", reportsCount: 36, reportedDate: "2025-10-22", status: "Blacklisted" },
+  { id: 74, accountNumber: "214-0-66789-0", name: "Teerayut Petchdee", bankCompany: "Bank B", scamType: "Online Watch Store Scam", reportsCount: 20, reportedDate: "2025-10-20", status: "Blacklisted" },
+  { id: 75, accountNumber: "325-6-22345-4", name: "Sirilak Thongkham", bankCompany: "Bank C", scamType: "Pawn Shop Redemption Scam", reportsCount: 13, reportedDate: "2025-10-18", status: "Flagged Mule" },
+  { id: 76, accountNumber: "436-2-88909-8", name: "Somboon Chaiworakul", bankCompany: "Bank D", scamType: "Court Warrant Extortion Scam", reportsCount: 43, reportedDate: "2025-10-15", status: "Blacklisted" },
+  { id: 77, accountNumber: "547-8-44563-3", name: "Chanida Rojanavit", bankCompany: "Bank E", scamType: "Mystery Box Lottery Scam", reportsCount: 15, reportedDate: "2025-10-12", status: "Flagged Mule" },
+  { id: 78, accountNumber: "658-4-00127-7", name: "Tawin Sukprasert", bankCompany: "Bank F", scamType: "Motorcycle Parts Fraud", reportsCount: 12, reportedDate: "2025-10-10", status: "Under Investigation" },
+  { id: 79, accountNumber: "769-0-66781-2", name: "Wilaiwan Sombat", bankCompany: "Bank A", scamType: "Stock Tipster VIP Group Scam", reportsCount: 38, reportedDate: "2025-10-08", status: "Blacklisted" },
+  { id: 80, accountNumber: "880-6-22347-6", name: "Noppadol Chaichana", bankCompany: "Bank B", scamType: "Travel Package Voucher Scam", reportsCount: 25, reportedDate: "2025-10-05", status: "Blacklisted" },
+  { id: 81, accountNumber: "991-2-88901-1", name: "Boonruang Phongsak", bankCompany: "Bank C", scamType: "Instant Cash Transfer Scam", reportsCount: 18, reportedDate: "2025-10-02", status: "Blacklisted" },
+  { id: 82, accountNumber: "104-8-44565-5", name: "Patsara Ruangrit", bankCompany: "Bank D", scamType: "Provincial Police Imposter", reportsCount: 46, reportedDate: "2025-09-30", status: "Blacklisted" },
+  { id: 83, accountNumber: "215-4-00129-0", name: "Arthit Srisuk", bankCompany: "Bank E", scamType: "Cryptocurrency Wallet Drainer", reportsCount: 29, reportedDate: "2025-09-27", status: "Blacklisted" },
+  { id: 84, accountNumber: "326-0-66783-4", name: "Kamonrat Boonmee", bankCompany: "Bank F", scamType: "Cosmetics Wholesale Deposit Scam", reportsCount: 10, reportedDate: "2025-09-25", status: "Under Investigation" },
+  { id: 85, accountNumber: "437-6-22349-8", name: "Preecha Kaewmanee", bankCompany: "Bank A", scamType: "Oil Futures Trading Fraud", reportsCount: 34, reportedDate: "2025-09-22", status: "Blacklisted" },
+  { id: 86, accountNumber: "548-2-88903-3", name: "Chutimon Thanakit", bankCompany: "Bank B", scamType: "Handbag Pre-order Fraud", reportsCount: 21, reportedDate: "2025-09-20", status: "Blacklisted" },
+  { id: 87, accountNumber: "659-8-44567-7", name: "Thanakorn Phisitkul", bankCompany: "Bank C", scamType: "Credit Card Limit Increase Scam", reportsCount: 16, reportedDate: "2025-09-18", status: "Flagged Mule" },
+  { id: 88, accountNumber: "770-4-00121-2", name: "Wichai Chaiyarat", bankCompany: "Bank D", scamType: "Revenue Department Impersonator", reportsCount: 47, reportedDate: "2025-09-15", status: "Blacklisted" },
+  { id: 89, accountNumber: "881-0-66785-6", name: "Duangporn Sirirat", bankCompany: "Bank E", scamType: "Online Typing Job Fraud", reportsCount: 14, reportedDate: "2025-09-12", status: "Flagged Mule" },
+  { id: 90, accountNumber: "992-6-22340-1", name: "Sompote Thanakorn", bankCompany: "Bank F", scamType: "Bicycle Marketplace Fraud", reportsCount: 8, reportedDate: "2025-09-10", status: "Under Investigation" },
+  { id: 91, accountNumber: "105-2-88904-5", name: "Chariya Boonchom", bankCompany: "Bank A", scamType: "Foreign Exchange Staking Scam", reportsCount: 31, reportedDate: "2025-09-08", status: "Blacklisted" },
+  { id: 92, accountNumber: "216-8-44568-0", name: "Nattapong Phromsri", bankCompany: "Bank B", scamType: "Smartphone Repair Advance Scam", reportsCount: 11, reportedDate: "2025-09-05", status: "Under Investigation" },
+  { id: 93, accountNumber: "327-4-00122-4", name: "Prapaporn Ruangwichit", bankCompany: "Bank C", scamType: "Instant 0% Loan Scam", reportsCount: 27, reportedDate: "2025-09-02", status: "Blacklisted" },
+  { id: 94, accountNumber: "438-0-66786-8", name: "Thanawat Chaiprasert", bankCompany: "Bank D", scamType: "AOC 1441 Blacklisted Mule", reportsCount: 53, reportedDate: "2025-08-30", status: "Blacklisted" },
+  { id: 95, accountNumber: "549-6-22342-3", name: "Ratsamee Charoenwong", bankCompany: "Bank E", scamType: "Home Assembly Job Kit Scam", reportsCount: 16, reportedDate: "2025-08-28", status: "Flagged Mule" },
+  { id: 96, accountNumber: "660-2-88906-7", name: "Panuwat Mongkolpan", bankCompany: "Bank F", scamType: "Camp Gear Reseller Fraud", reportsCount: 13, reportedDate: "2025-08-25", status: "Under Investigation" },
+  { id: 97, accountNumber: "771-8-44560-2", name: "Supaporn Srijinda", bankCompany: "Bank A", scamType: "Digital Asset Arbitrage Scam", reportsCount: 39, reportedDate: "2025-08-22", status: "Blacklisted" },
+  { id: 98, accountNumber: "882-4-00124-6", name: "Kittichai Suksan", bankCompany: "Bank B", scamType: "Designer Sunglasses Scam", reportsCount: 18, reportedDate: "2025-08-20", status: "Blacklisted" },
+  { id: 99, accountNumber: "993-0-66788-1", name: "Chuleeporn Ruangprapha", bankCompany: "Bank C", scamType: "Fast Approval Salary Advance Fraud", reportsCount: 24, reportedDate: "2025-08-18", status: "Blacklisted" },
+  { id: 100, accountNumber: "106-6-22342-5", name: "Wichian Chonpradit", bankCompany: "Bank D", scamType: "Interpol / Royal Police Impersonator", reportsCount: 55, reportedDate: "2025-08-15", status: "Blacklisted" },
+];
+
+/**
+ * Searches the bank account blacklist by query:
+ * Matches account number (with or without dashes/spaces), account owner name, or bank company name.
+ */
+export function searchBankAccounts(query: string): ReportedBankAccount[] {
+  const cleanQuery = query.trim().toLowerCase();
+  if (!cleanQuery) return [];
+
+  const digitsOnlyQuery = cleanQuery.replace(/[\s-]/g, "");
+
+  return MOCK_BANK_ACCOUNTS.filter((acc) => {
+    const cleanAccNum = acc.accountNumber.replace(/[\s-]/g, "");
+    const matchNum = cleanAccNum.includes(digitsOnlyQuery) || acc.accountNumber.toLowerCase().includes(cleanQuery);
+    const matchName = acc.name.toLowerCase().includes(cleanQuery);
+    const matchBank = acc.bankCompany.toLowerCase().includes(cleanQuery);
+
+    return matchNum || matchName || matchBank;
+  });
+}
