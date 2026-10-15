@@ -10,9 +10,17 @@ import type { ScamAnalysis } from "./analysis-schema";
 export interface HistoryEntry {
   id: string;
   createdAt: string;
-  kind: "screenshot" | "text" | "url";
+  kind: "screenshot" | "text" | "url" | "bank_report";
   label: string;
   analysis: ScamAnalysis;
+  reportDetails?: {
+    accountNumber: string;
+    accountName: string;
+    bankCompany: string;
+    platform?: string;
+    scamType: string;
+    notes?: string;
+  };
 }
 
 const KEY = "scamlens_history_v1";
