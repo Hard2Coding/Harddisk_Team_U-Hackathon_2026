@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th" suppressHydrationWarning className="dark">
-      <body className="antialiased selection:bg-blue-500 selection:text-white">
+      <body suppressHydrationWarning className="antialiased selection:bg-blue-500 selection:text-white">
         <ThemeProvider>
           <AuthProvider>
             <div className="flex min-h-screen">
