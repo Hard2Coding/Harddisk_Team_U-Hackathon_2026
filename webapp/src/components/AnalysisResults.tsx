@@ -15,6 +15,7 @@ import {
   RotateCcw,
   FlaskConical,
   Sparkles,
+  Landmark,
 } from "lucide-react";
 import { RISK_COPY, formatReport, type RiskLevel, type ScamAnalysis, type Severity } from "@/lib/analysis-schema";
 import { cn } from "@/lib/utils";
@@ -156,6 +157,58 @@ export function AnalysisResults({ analysis, onReset, resetLabel }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Matched Fraudulent / Mule Bank Account Alert Card */}
+      {analysis.matchedBankAccounts && analysis.matchedBankAccounts.length > 0 && (
+        <div className="rounded-2xl border-2 border-red-500/50 bg-red-50/80 dark:bg-red-950/25 p-5 sm:p-6 space-y-3.5 text-red-950 dark:text-red-200 shadow-sm animate-rise">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="grid place-items-center w-8 h-8 rounded-lg bg-red-600 text-white shadow-sm">
+                <Landmark className="w-4.5 h-4.5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-red-700 dark:text-red-400">
+                  🚨 Flagged Bank Account Found in Scam Database
+                </h3>
+                <p className="text-xs text-red-900/80 dark:text-red-300">
+                  Cross-referenced with police and community threat records. DO NOT transfer money!
+                </p>
+              </div>
+            </div>
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-600 text-white shrink-0">
+              Database Match
+            </span>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 pt-1">
+            {analysis.matchedBankAccounts.map((acc, i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-red-200/90 dark:border-red-800/50 bg-surface/95 dark:bg-stone-900/90 p-4 space-y-2 shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono font-bold text-base text-ink tracking-tight">
+                    {acc.accountNumber}
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300">
+                    {acc.status}
+                  </span>
+                </div>
+                <div className="text-xs text-muted flex items-center justify-between">
+                  <span>Name: <strong className="text-ink font-medium">{acc.name}</strong></span>
+                  <span className="font-medium text-ink bg-soft px-2 py-0.5 rounded">{acc.bankCompany}</span>
+                </div>
+                <div className="text-xs text-amber-700 dark:text-amber-400 font-medium flex items-center justify-between pt-2 border-t border-line/70">
+                  <span className="truncate max-w-44">{acc.scamType}</span>
+                  <span className="font-bold text-red-600 dark:text-red-400 shrink-0">
+                    {acc.reportsCount} victim reports
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-5 lg:grid-cols-5">
         {/* Indicators */}
