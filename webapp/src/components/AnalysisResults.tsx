@@ -16,6 +16,7 @@ import {
   FlaskConical,
   Sparkles,
   Landmark,
+  Cpu,
 } from "lucide-react";
 import { RISK_COPY, formatReport, type RiskLevel, type ScamAnalysis, type Severity } from "@/lib/analysis-schema";
 import { cn } from "@/lib/utils";
@@ -206,6 +207,67 @@ export function AnalysisResults({ analysis, onReset, resetLabel }: Props) {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Machine Learning Model Prediction Card */}
+      {analysis.mlPrediction && (
+        <div className="rounded-2xl border border-line bg-surface p-5 sm:p-6 space-y-3.5 shadow-xs animate-rise">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="grid place-items-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700">
+                <Cpu className="w-4.5 h-4.5" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm text-ink">
+                  In-App ML Model Prediction
+                </h3>
+                <p className="text-xs text-muted">
+                  Model: <span className="font-medium text-ink">{analysis.mlPrediction.algorithm}</span>
+                </p>
+              </div>
+            </div>
+            <span
+              className={cn(
+                "px-2.5 py-1 rounded-full text-xs font-semibold ring-1 ring-inset",
+                analysis.mlPrediction.isScam
+                  ? "bg-red-50 text-red-700 ring-red-200"
+                  : "bg-emerald-50 text-emerald-800 ring-emerald-200"
+              )}
+            >
+              {analysis.mlPrediction.isScam ? "Flagged by ML" : "Clean Text"} · {(analysis.mlPrediction.confidence * 100).toFixed(0)}% confidence
+            </span>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 pt-1 text-xs">
+            <div className="p-3 rounded-xl bg-soft border border-line/60 space-y-1">
+              <span className="text-muted block text-[11px] font-medium uppercase tracking-wider">
+                Predicted Scam Category
+              </span>
+              <span className="font-semibold text-ink text-sm block">
+                {analysis.mlPrediction.categoryLabel}
+              </span>
+            </div>
+            <div className="p-3 rounded-xl bg-soft border border-line/60 space-y-1">
+              <span className="text-muted block text-[11px] font-medium uppercase tracking-wider">
+                Top Indicative Feature Tokens
+              </span>
+              <div className="flex flex-wrap gap-1 pt-0.5">
+                {analysis.mlPrediction.matchedKeywords.length > 0 ? (
+                  analysis.mlPrediction.matchedKeywords.map((kw, i) => (
+                    <span
+                      key={i}
+                      className="px-1.5 py-0.5 rounded bg-surface border border-line text-[11px] font-mono text-ink"
+                    >
+                      {kw}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-muted italic">No high-risk keywords detected</span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}

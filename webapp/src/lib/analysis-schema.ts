@@ -25,6 +25,16 @@ export interface MatchedBankAccount {
   reportedDate?: string;
 }
 
+export interface MLPrediction {
+  isScam: boolean;
+  mlRiskScore: number;
+  predictedCategory: string;
+  categoryLabel: string;
+  confidence: number;
+  matchedKeywords: string[];
+  algorithm: string;
+}
+
 /** Where the assessment came from. */
 export type AnalysisSource = "gemini" | "rules" | "demo";
 
@@ -37,6 +47,7 @@ export interface ScamAnalysis {
   uncertainties: string[];
   source: AnalysisSource;
   matchedBankAccounts?: MatchedBankAccount[];
+  mlPrediction?: MLPrediction;
 }
 
 export const MAX_INDICATORS = 5;

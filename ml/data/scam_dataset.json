@@ -1,0 +1,128 @@
+[
+  {
+    "id": "SCAM_001",
+    "text": "พัสดุของคุณไม่สามารถจัดส่งได้เนื่องจากค้างค่าภาษี 25 บาท กรุณาชำระที่ http://thai-post-tax.top/pay",
+    "category": "courier_fee",
+    "isScam": true,
+    "confidence": 0.98
+  },
+  {
+    "id": "SCAM_002",
+    "text": "Your package is held at our distribution center due to unpaid customs fee of 30 THB. Pay immediately: http://parcel-tracking-update.xyz",
+    "category": "courier_fee",
+    "isScam": true,
+    "confidence": 0.96
+  },
+  {
+    "id": "SCAM_003",
+    "text": "คุณได้รับสิทธิ์กู้เงินด่วน 100,000 บาท ดอกเบี้ย 0% อนุมัติไวใน 5 นาที แอดไลน์ @fastloan_easy เพื่อรับเงิน",
+    "category": "fake_loan",
+    "isScam": true,
+    "confidence": 0.97
+  },
+  {
+    "id": "SCAM_004",
+    "text": "Congratulations! Pre-approved personal credit limit 50,000 THB with zero interest. Click here to withdraw cash: http://easy-credit-thai.vip",
+    "category": "fake_loan",
+    "isScam": true,
+    "confidence": 0.95
+  },
+  {
+    "id": "SCAM_005",
+    "text": "แจ้งเตือนจากธนาคาร: บัญชีของคุณถูกระงับชั่วคราวเนื่องจากตรวจพบธุรกรรมผิดปกติ กรุณายืนยันตัวตนพร้อมระบุ OTP ที่ http://kbank-verify-otp.xyz",
+    "category": "otp_theft",
+    "isScam": true,
+    "confidence": 0.99
+  },
+  {
+    "id": "SCAM_006",
+    "text": "Security Alert: Unusual login detected from IP 185.220.101.4. Verify your bank credentials and input your 6-digit OTP code to unlock account.",
+    "category": "otp_theft",
+    "isScam": true,
+    "confidence": 0.98
+  },
+  {
+    "id": "SCAM_007",
+    "text": "กรมสรรพากร: คุณมีสิทธิ์รับเงินภาษีคืนจำนวน 4,500 บาท ดาวน์โหลดแอปพลิเคชันเพื่อยืนยันสิทธิ์ที่ http://rd-tax-refund.online",
+    "category": "government_impersonation",
+    "isScam": true,
+    "confidence": 0.99
+  },
+  {
+    "id": "SCAM_008",
+    "text": "สำนักงานตำรวจไซเบอร์ (บช.สอท.): มีหมายเรียกตรวจสอบคดีฟอกเงิน บัญชีของท่านมีส่วนพัวพันกับเว็บพนัน แอดไลน์เพื่อแสดงความบริสุทธิ์ใจ",
+    "category": "police_impersonation",
+    "isScam": true,
+    "confidence": 0.97
+  },
+  {
+    "id": "SCAM_009",
+    "text": "งานพาร์ทไทม์ออนไลน์ กดไลก์คลิป TikTok/YouTube รายได้วันละ 800 - 3,000 บาท จ่ายเงินจริงทุกวัน ไม่ต้องมีประสบการณ์ สนใจทักแชท",
+    "category": "task_investment",
+    "isScam": true,
+    "confidence": 0.96
+  },
+  {
+    "id": "SCAM_010",
+    "text": "Exclusive VIP Crypto Signals: Earn 25% daily guaranteed return on automated arbitrage bot. Minimum deposit 500 USDT.",
+    "category": "crypto_fraud",
+    "isScam": true,
+    "confidence": 0.94
+  },
+  {
+    "id": "SCAM_011",
+    "text": "การไฟฟ้าส่วนภูมิภาค (PEA): คืนเงินประกันการใช้ไฟฟ้า 2,000 บาท สำหรับทุกครัวเรือน แตะลิงก์เพื่อกรอกข้อมูลบัญชีรับเงิน",
+    "category": "utility_impersonation",
+    "isScam": true,
+    "confidence": 0.98
+  },
+  {
+    "id": "SCAM_012",
+    "text": "Flash Express: พัสดุหมายเลข TH0198421 ไม่สามารถจัดส่งได้เนื่องจากเบอร์ติดต่อไม่ถูกต้อง กรุณาอัปเดตข้อมูลที่ลิงก์",
+    "category": "courier_fee",
+    "isScam": true,
+    "confidence": 0.95
+  },
+  {
+    "id": "LEGIT_001",
+    "text": "รหัส OTP สำหรับเข้าสู่ระบบของคุณคือ 481920 (มีอายุการใช้งาน 5 นาที) ห้ามเปิดเผยรหัสนี้แก่ผู้อื่นหรือเจ้าหน้าที่ธนาคารทุกกรณี",
+    "category": "legitimate",
+    "isScam": false,
+    "confidence": 0.99
+  },
+  {
+    "id": "LEGIT_002",
+    "text": "Your one-time password (OTP) is 719302 for transaction authorization. Never share this code with anyone.",
+    "category": "legitimate",
+    "isScam": false,
+    "confidence": 0.98
+  },
+  {
+    "id": "LEGIT_003",
+    "text": "Shopee: คำสั่งซื้อหมายเลข 261016A993 จัดส่งสำเร็จเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ",
+    "category": "legitimate",
+    "isScam": false,
+    "confidence": 0.99
+  },
+  {
+    "id": "LEGIT_004",
+    "text": "ยอดเงินคงเหลือในบัญชีของคุณ ณ วันที่ 16/10/2026 คือ 12,450.00 บาท",
+    "category": "legitimate",
+    "isScam": false,
+    "confidence": 0.97
+  },
+  {
+    "id": "LEGIT_005",
+    "text": "AIS: ยอดค่าบริการรอบบิลปัจจุบันของคุณจำนวน 499 บาท ครบกำหนดชำระวันที่ 25/10/2026 ชำระผ่านแอป myAIS",
+    "category": "legitimate",
+    "isScam": false,
+    "confidence": 0.96
+  },
+  {
+    "id": "LEGIT_006",
+    "text": "พรุ่งนี้มีนัดประชุมทีม U-Hackathon เวลา 10:00 น. ที่ห้องสมุด อย่าลืมนำแล็ปท็อปมาด้วยนะครับ",
+    "category": "legitimate",
+    "isScam": false,
+    "confidence": 0.99
+  }
+]
