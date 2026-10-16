@@ -160,22 +160,22 @@ export function AnalysisResults({ analysis, onReset, resetLabel }: Props) {
 
       {/* Matched Fraudulent / Mule Bank Account Alert Card */}
       {analysis.matchedBankAccounts && analysis.matchedBankAccounts.length > 0 && (
-        <div className="rounded-2xl border-2 border-red-500/50 bg-red-50/80 dark:bg-red-950/25 p-5 sm:p-6 space-y-3.5 text-red-950 dark:text-red-200 shadow-sm animate-rise">
+        <div className="rounded-2xl border border-red-200 bg-red-50/40 p-5 sm:p-6 space-y-4 animate-rise">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="grid place-items-center w-8 h-8 rounded-lg bg-red-600 text-white shadow-sm">
-                <Landmark className="w-4.5 h-4.5" />
+            <div className="flex items-center gap-3">
+              <div className="grid place-items-center w-10 h-10 rounded-xl bg-red-100 text-red-700 shrink-0">
+                <Landmark className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-base text-red-700 dark:text-red-400">
+                <h3 className="font-semibold text-base text-red-950">
                   🚨 Flagged Bank Account Found in Scam Database
                 </h3>
-                <p className="text-xs text-red-900/80 dark:text-red-300">
-                  Cross-referenced with police and community threat records. DO NOT transfer money!
+                <p className="text-xs sm:text-sm text-red-900/80">
+                  Cross-referenced with police and community threat records. Do not transfer money!
                 </p>
               </div>
             </div>
-            <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-600 text-white shrink-0">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 ring-1 ring-inset ring-red-200 shrink-0">
               Database Match
             </span>
           </div>
@@ -184,13 +184,13 @@ export function AnalysisResults({ analysis, onReset, resetLabel }: Props) {
             {analysis.matchedBankAccounts.map((acc, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-red-200/90 dark:border-red-800/50 bg-surface/95 dark:bg-stone-900/90 p-4 space-y-2 shadow-sm"
+                className="rounded-xl border border-line bg-surface p-4 space-y-2 shadow-xs"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-mono font-bold text-base text-ink tracking-tight">
                     {acc.accountNumber}
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300">
+                  <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-red-50 text-red-700 ring-1 ring-inset ring-red-200">
                     {acc.status}
                   </span>
                 </div>
@@ -198,9 +198,9 @@ export function AnalysisResults({ analysis, onReset, resetLabel }: Props) {
                   <span>Name: <strong className="text-ink font-medium">{acc.name}</strong></span>
                   <span className="font-medium text-ink bg-soft px-2 py-0.5 rounded">{acc.bankCompany}</span>
                 </div>
-                <div className="text-xs text-amber-700 dark:text-amber-400 font-medium flex items-center justify-between pt-2 border-t border-line/70">
-                  <span className="truncate max-w-44">{acc.scamType}</span>
-                  <span className="font-bold text-red-600 dark:text-red-400 shrink-0">
+                <div className="text-xs text-ink/80 font-medium flex items-center justify-between pt-2 border-t border-line">
+                  <span className="truncate max-w-44 text-muted">{acc.scamType}</span>
+                  <span className="font-semibold text-red-700 shrink-0">
                     {acc.reportsCount} victim reports
                   </span>
                 </div>

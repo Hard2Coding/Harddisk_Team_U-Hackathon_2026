@@ -14,6 +14,7 @@ import {
 import { ScreenshotUploader } from "@/components/ScreenshotUploader";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { AlgorithmFlowchart } from "@/components/AlgorithmFlowchart";
 import type { ScamAnalysis } from "@/lib/analysis-schema";
 import { addHistory } from "@/lib/history";
 import { useUserProfile, incrementChecksUsed } from "@/lib/userProfile";
@@ -189,31 +190,35 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* How it works */}
+      {/* How it works & Algorithm Flowchart */}
       {!result && (
-        <section id="how-it-works" aria-labelledby="how-heading" className="mt-20 scroll-mt-24">
-          <h2 id="how-heading" className="text-center text-sm font-medium text-muted uppercase tracking-wider">
-            How it works
-          </h2>
-          <ol className="mt-6 grid gap-4 sm:grid-cols-3">
-            {[
-              { icon: Upload, title: "Upload", text: "Add a screenshot of a message, chat, or email you’re unsure about." },
-              { icon: ShieldQuestion, title: "Review", text: "See the warning signs, with the exact words that raised concern." },
-              { icon: ListChecks, title: "Act safely", text: "Follow clear next steps to protect your money and accounts." },
-            ].map((s, i) => (
-              <li key={s.title} className="rounded-2xl border border-line bg-surface p-5">
-                <div className="flex items-center gap-3">
-                  <span className="grid place-items-center w-9 h-9 rounded-lg bg-soft">
-                    <s.icon className="w-4.5 h-4.5" strokeWidth={1.8} />
-                  </span>
-                  <span className="text-xs text-subtle font-medium">Step {i + 1}</span>
-                </div>
-                <p className="mt-4 font-medium">{s.title}</p>
-                <p className="mt-1 text-sm text-muted leading-relaxed">{s.text}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <>
+          <section id="how-it-works" aria-labelledby="how-heading" className="mt-20 scroll-mt-24">
+            <h2 id="how-heading" className="text-center text-sm font-medium text-muted uppercase tracking-wider">
+              How it works
+            </h2>
+            <ol className="mt-6 grid gap-4 sm:grid-cols-3">
+              {[
+                { icon: Upload, title: "Upload", text: "Add a screenshot of a message, chat, or email you’re unsure about." },
+                { icon: ShieldQuestion, title: "Review", text: "See the warning signs, with the exact words that raised concern." },
+                { icon: ListChecks, title: "Act safely", text: "Follow clear next steps to protect your money and accounts." },
+              ].map((s, i) => (
+                <li key={s.title} className="rounded-2xl border border-line bg-surface p-5">
+                  <div className="flex items-center gap-3">
+                    <span className="grid place-items-center w-9 h-9 rounded-lg bg-soft">
+                      <s.icon className="w-4.5 h-4.5" strokeWidth={1.8} />
+                    </span>
+                    <span className="text-xs text-subtle font-medium">Step {i + 1}</span>
+                  </div>
+                  <p className="mt-4 font-medium">{s.title}</p>
+                  <p className="mt-1 text-sm text-muted leading-relaxed">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <AlgorithmFlowchart />
+        </>
       )}
     </div>
   );
