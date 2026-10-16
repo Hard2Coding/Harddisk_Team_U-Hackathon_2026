@@ -15,6 +15,16 @@ export interface RiskIndicatorItem {
   severity: Severity;
 }
 
+export interface MatchedBankAccount {
+  accountNumber: string;
+  name: string;
+  bankCompany: string;
+  scamType: string;
+  reportsCount: number;
+  status: string;
+  reportedDate?: string;
+}
+
 /** Where the assessment came from. */
 export type AnalysisSource = "gemini" | "rules" | "demo";
 
@@ -26,6 +36,7 @@ export interface ScamAnalysis {
   recommendedActions: string[];
   uncertainties: string[];
   source: AnalysisSource;
+  matchedBankAccounts?: MatchedBankAccount[];
 }
 
 export const MAX_INDICATORS = 5;

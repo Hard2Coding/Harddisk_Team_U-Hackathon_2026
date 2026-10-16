@@ -41,4 +41,15 @@ export const DEMO_ANALYSIS: ScamAnalysis = {
   ],
   uncertainties: ["The screenshot alone cannot verify who sent the message."],
   source: "demo",
+  matchedBankAccounts: [
+    {
+      accountNumber: "140-2-99881-0",
+      name: "Somchai Rattanakorn",
+      bankCompany: "Bank A",
+      scamType: "Fake Investment / Crypto",
+      reportsCount: 24,
+      status: "Blacklisted",
+      reportedDate: "2026-03-14",
+    },
+  ],
 };

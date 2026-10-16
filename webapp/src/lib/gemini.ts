@@ -6,6 +6,12 @@ import {
   MAX_INDICATORS,
   MAX_ACTIONS,
 } from "./analysis-schema";
+import {
+  extractBankAccountsFromText,
+  checkMultipleBankAccounts,
+  formatBankMatchForPrompt,
+  enrichAnalysisWithBankMatches,
+} from "./bank-threat-lookup";
 
 const GEMINI_SYSTEM_INSTRUCTION = `You are ScamLens AI, a specialized cybersecurity and fraud-detection intelligence engine.
 Your task is to analyze user-submitted screenshots (SMS messages, chat apps, emails, website previews, fake invoices, or social media offers) to detect scams, social engineering, impersonation, and phishing attempts.
@@ -15,7 +21,7 @@ CRITICAL SECURITY RULES:
 2. Separate observed evidence from inferences. Quote EXACT words or phrases visible in the screenshot whenever readable.
 3. Be realistic and safety-focused. A low risk score should never be described as a 100% guarantee of safety.
 4. Calculate a "riskScore" integer between 0 and 100 representing the estimated percentage likelihood that the analyzed content is fraudulent/a scam:
-   - 70 to 100: "high" risk (strong signals like asking for OTPs, fake bank domain, urgent threats)
+   - 70 to 100: "high" risk (strong signals like asking for OTPs, fake bank domain, urgent threats, blacklisted mule accounts)
    - 40 to 69: "medium" risk (unverified links, unsolicited messages, questionable claims)
    - 0 to 39: "low" risk (standard transactional notices without credential theft or urgency)
    - If the image is blurry, corrupted, unreadable, or not a communication/message, use "uncertain" for riskLevel and a moderate riskScore like 50.
@@ -39,6 +45,9 @@ You must respond ONLY with a valid JSON object matching this exact schema:
   ],
   "uncertainties": [
     "Limitations, e.g. screenshot alone cannot prove sender identity"
+  ],
+  "detectedBankAccounts": [
+    "optional list of bank account numbers or PromptPay IDs visible in the image"
   ]
 }`;
 
@@ -55,6 +64,14 @@ interface RawGeminiOutput {
   }>;
   recommendedActions?: string[];
   uncertainties?: string[];
+  detectedBankAccounts?: string[];
+}
+
+interface QuickPaymentScanOutput {
+  hasBankOrPayment?: boolean;
+  accountNumbers?: string[];
+  recipientName?: string;
+  bankName?: string;
 }
 
 function sanitizeLevel(level: unknown, score: number): RiskLevel {
@@ -76,7 +93,6 @@ function sanitizeSeverity(sev: unknown): Severity {
 }
 
 export function parseGeminiJson(rawText: string): ScamAnalysis {
-  // Strip optional markdown code fences ```json ... ```
   let cleaned = rawText.trim();
   if (cleaned.startsWith("```")) {
     cleaned = cleaned.replace(/^```[a-zA-Z]*\n?/, "").replace(/\n?```$/, "").trim();
@@ -135,6 +151,12 @@ function getCandidateModels(): string[] {
   return Array.from(new Set([configured, ...defaults].filter(Boolean)));
 }
 
+/**
+ * 2-Stage Grounding Loop:
+ * 1. Fast, low-token pass to extract any bank account/PromptPay details.
+ * 2. Cross-reference with the scam database.
+ * 3. Return grounded intelligence to Gemini for final explainable assessment.
+ */
 export async function analyzeScreenshotWithGemini(
   imageBuffer: Buffer,
   mimeType: string
@@ -152,6 +174,59 @@ export async function analyzeScreenshotWithGemini(
 
   for (const modelName of modelsToTry) {
     try {
+      // Step 1: Lightweight Payment & Bank Account Detection Pass
+      let detectedAccounts: string[] = [];
+      try {
+        const quickScan = await ai.models.generateContent({
+          model: modelName,
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  inlineData: { mimeType, data: base64Data },
+                },
+                {
+                  text: `Identify if this image contains any bank account numbers (10-12 digits e.g. XXX-X-XXXXX-X), PromptPay IDs, or recipient transfer info.
+Respond ONLY with a JSON object:
+{"hasBankOrPayment": boolean, "accountNumbers": string[], "recipientName": string, "bankName": string}`,
+                },
+              ],
+            },
+          ],
+          config: {
+            responseMimeType: "application/json",
+          },
+        });
+
+        const quickText = quickScan.text || "";
+        if (quickText) {
+          let cleaned = quickText.trim();
+          if (cleaned.startsWith("```")) {
+            cleaned = cleaned.replace(/^```[a-zA-Z]*\n?/, "").replace(/\n?```$/, "").trim();
+          }
+          const parsed = JSON.parse(cleaned) as QuickPaymentScanOutput;
+          if (parsed && Array.isArray(parsed.accountNumbers)) {
+            detectedAccounts = parsed.accountNumbers.filter(Boolean);
+          }
+        }
+      } catch (scanErr) {
+        console.warn("Quick bank account scan failed, proceeding to standard analysis:", scanErr);
+      }
+
+      // Step 2: Query the local bank account scam database
+      const bankMatches = checkMultipleBankAccounts(detectedAccounts);
+
+      // Step 3: Construct Grounded Final Prompt for Gemini
+      let finalPrompt = "Analyze this screenshot for scams, phishing, fake alerts, credential harvesting, or social engineering. Identify exact readable evidence quotes, explain the warning signs, assign a risk percentage from 0 to 100, and recommend next steps.";
+
+      if (bankMatches.length > 0) {
+        // Feed database threat intel into Gemini
+        finalPrompt += `\n\n${formatBankMatchForPrompt(bankMatches[0])}\nCRITICAL: Ground your evaluation on this verified blacklisted bank account. Set riskScore to >= 95 and riskLevel to 'high'.`;
+      } else if (detectedAccounts.length > 0) {
+        finalPrompt += `\n\n[DATABASE STATUS: Account ${detectedAccounts.join(", ")} was checked against the reported scam database: No prior records found. Remind user that unlisted accounts are NOT guaranteed safe.]`;
+      }
+
       const response = await ai.models.generateContent({
         model: modelName,
         contents: [
@@ -159,13 +234,10 @@ export async function analyzeScreenshotWithGemini(
             role: "user",
             parts: [
               {
-                inlineData: {
-                  mimeType,
-                  data: base64Data,
-                },
+                inlineData: { mimeType, data: base64Data },
               },
               {
-                text: "Analyze this screenshot for scams, phishing, fake alerts, credential harvesting, or social engineering. Identify exact readable evidence quotes, explain the warning signs, assign a risk percentage from 0 to 100, and recommend next steps.",
+                text: finalPrompt,
               },
             ],
           },
@@ -178,7 +250,18 @@ export async function analyzeScreenshotWithGemini(
 
       const responseText = response.text || "";
       if (responseText) {
-        return parseGeminiJson(responseText);
+        const rawAnalysis = parseGeminiJson(responseText);
+
+        // Also check if Gemini extracted any additional accounts in its indicators/quotes
+        const textToSearch = `${rawAnalysis.summary} ${rawAnalysis.indicators.map((i) => `${i.evidence} ${i.explanation}`).join(" ")}`;
+        const extraAccounts = extractBankAccountsFromText(textToSearch);
+        const extraMatches = checkMultipleBankAccounts(extraAccounts);
+
+        const allMatches = [...bankMatches, ...extraMatches].filter(
+          (m, idx, arr) => arr.findIndex((x) => x.accountNumber === m.accountNumber) === idx
+        );
+
+        return enrichAnalysisWithBankMatches(rawAnalysis, allMatches);
       }
     } catch (err: unknown) {
       lastError = err;
@@ -189,12 +272,27 @@ export async function analyzeScreenshotWithGemini(
   throw lastError || new Error("All Gemini models were unavailable. Please try again shortly.");
 }
 
+/**
+ * Text & Link Analysis with pre-LLM Bank Account Database Verification.
+ * Saves tokens by querying the local database BEFORE calling Gemini.
+ */
 export async function analyzeTextWithGemini(
   text: string
 ): Promise<ScamAnalysis> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is not configured.");
+  }
+
+  // 1. Check local bank account database before calling Gemini (0 tokens used!)
+  const candidateAccounts = extractBankAccountsFromText(text);
+  const bankMatches = checkMultipleBankAccounts(candidateAccounts);
+
+  let promptText = `Analyze the following message/link for scam risks, impersonation, or credential theft:\n\n"""\n${text}\n"""`;
+
+  if (bankMatches.length > 0) {
+    // Inject verified ground truth into LLM prompt
+    promptText += `\n\n${formatBankMatchForPrompt(bankMatches[0])}\nCRITICAL: Ground your evaluation on this confirmed blacklisted bank account. Set riskScore to >= 95 and warn against sending money.`;
   }
 
   const ai = new GoogleGenAI({ apiKey });
@@ -211,7 +309,7 @@ export async function analyzeTextWithGemini(
             role: "user",
             parts: [
               {
-                text: `Analyze the following message/link for scam risks, impersonation, or credential theft:\n\n"""\n${text}\n"""`,
+                text: promptText,
               },
             ],
           },
@@ -224,7 +322,8 @@ export async function analyzeTextWithGemini(
 
       const responseText = response.text || "";
       if (responseText) {
-        return parseGeminiJson(responseText);
+        const rawAnalysis = parseGeminiJson(responseText);
+        return enrichAnalysisWithBankMatches(rawAnalysis, bankMatches);
       }
     } catch (err: unknown) {
       lastError = err;
