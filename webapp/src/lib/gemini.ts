@@ -272,9 +272,11 @@ Respond ONLY with a JSON object:
   throw lastError || new Error("All Gemini models were unavailable. Please try again shortly.");
 }
 
+import { predictScamWithML } from "./ml/textClassifier";
+
 /**
- * Text & Link Analysis with pre-LLM Bank Account Database Verification.
- * Saves tokens by querying the local database BEFORE calling Gemini.
+ * Text & Link Analysis with pre-LLM Bank Account Database Verification and In-App ML Model.
+ * Saves tokens and provides dual-tier hybrid ensemble predictions.
  */
 export async function analyzeTextWithGemini(
   text: string
@@ -284,11 +286,23 @@ export async function analyzeTextWithGemini(
     throw new Error("GEMINI_API_KEY is not configured.");
   }
 
-  // 1. Check local bank account database before calling Gemini (0 tokens used!)
+  // 1. In-App ML Classification (TF-IDF + Naive Bayes, 0 API tokens!)
+  const mlPrediction = predictScamWithML(text);
+
+  // 2. Check local bank account database before calling Gemini (0 tokens used!)
   const candidateAccounts = extractBankAccountsFromText(text);
   const bankMatches = checkMultipleBankAccounts(candidateAccounts);
 
   let promptText = `Analyze the following message/link for scam risks, impersonation, or credential theft:\n\n"""\n${text}\n"""`;
+
+  // Inject ML Prior into LLM
+  if (mlPrediction.isScam) {
+    promptText += `\n\n[IN-APP ML PRIOR (TF-IDF + Naive Bayes)]:
+Detected Category: ${mlPrediction.categoryLabel}
+ML Model Risk Probability: ${mlPrediction.mlRiskScore}% (Confidence: ${(mlPrediction.confidence * 100).toFixed(1)}%)
+Top Indicative Feature Tokens: ${mlPrediction.matchedKeywords.join(", ")}
+Ground your evaluation considering this machine learning prediction.`;
+  }
 
   if (bankMatches.length > 0) {
     // Inject verified ground truth into LLM prompt
@@ -323,7 +337,11 @@ export async function analyzeTextWithGemini(
       const responseText = response.text || "";
       if (responseText) {
         const rawAnalysis = parseGeminiJson(responseText);
-        return enrichAnalysisWithBankMatches(rawAnalysis, bankMatches);
+        const enriched = enrichAnalysisWithBankMatches(rawAnalysis, bankMatches);
+        return {
+          ...enriched,
+          mlPrediction,
+        };
       }
     } catch (err: unknown) {
       lastError = err;

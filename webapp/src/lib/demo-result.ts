@@ -52,4 +52,13 @@ export const DEMO_ANALYSIS: ScamAnalysis = {
       reportedDate: "2026-03-14",
     },
   ],
+  mlPrediction: {
+    isScam: true,
+    mlRiskScore: 92,
+    predictedCategory: "otp_theft",
+    categoryLabel: "Banking OTP & Credential Harvesting",
+    confidence: 0.965,
+    matchedKeywords: ["otp", "suspended", "verify", "unfamiliar link"],
+    algorithm: "TF-IDF + Multinomial Naive Bayes (MNB)",
+  },
 };
