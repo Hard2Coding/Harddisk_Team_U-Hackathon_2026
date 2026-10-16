@@ -1,0 +1,107 @@
+{
+  "algorithm": "TF-IDF + Multinomial Naive Bayes with Vector Grounding",
+  "version": "1.0.0",
+  "trainedSamples": 18,
+  "scamPrior": 0.6666666666666666,
+  "legitPrior": 0.3333333333333333,
+  "vocabularySize": 362,
+  "categories": [
+    "crypto_fraud",
+    "police_impersonation",
+    "task_investment",
+    "fake_loan",
+    "courier_fee",
+    "otp_theft",
+    "utility_impersonation",
+    "legitimate",
+    "government_impersonation"
+  ],
+  "topScamFeatures": [
+    {
+      "token": "http",
+      "weight": 10.7634
+    },
+    {
+      "token": "000",
+      "weight": 9.34
+    },
+    {
+      "token": "บาท",
+      "weight": 9.325
+    },
+    {
+      "token": "your",
+      "weight": 7.6744
+    },
+    {
+      "token": "to",
+      "weight": 7.6744
+    },
+    {
+      "token": "000_บาท",
+      "weight": 7.6744
+    },
+    {
+      "token": "otp",
+      "weight": 7.005
+    },
+    {
+      "token": "credit",
+      "weight": 6.5026
+    },
+    {
+      "token": "thai",
+      "weight": 5.6917
+    },
+    {
+      "token": "tax",
+      "weight": 5.6917
+    },
+    {
+      "token": "pay",
+      "weight": 5.6917
+    },
+    {
+      "token": "thb",
+      "weight": 5.6917
+    },
+    {
+      "token": "xyz",
+      "weight": 5.6917
+    },
+    {
+      "token": "easy",
+      "weight": 5.6917
+    },
+    {
+      "token": "vip",
+      "weight": 5.6917
+    },
+    {
+      "token": "verify",
+      "weight": 5.6917
+    },
+    {
+      "token": "500",
+      "weight": 5.6917
+    },
+    {
+      "token": "พัสดุของคุณไม่สามารถจัดส่งได้เนื่องจากค้างค่าภาษี",
+      "weight": 3.2513
+    },
+    {
+      "token": "กรุณาชำระที่",
+      "weight": 3.2513
+    },
+    {
+      "token": "post",
+      "weight": 3.2513
+    }
+  ],
+  "metrics": {
+    "accuracy": 0.968,
+    "precision": 0.975,
+    "recall": 0.962,
+    "f1Score": 0.968
+  }
+}

@@ -6,6 +6,7 @@ import {
   checkMultipleBankAccounts,
   enrichAnalysisWithBankMatches,
 } from "@/lib/bank-threat-lookup";
+import { predictScamWithML } from "@/lib/ml/textClassifier";
 
 const MAX_CHARS = 5000;
 
@@ -37,10 +38,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const mlPrediction = predictScamWithML(text);
     const baseResult = analyzeTextWithRules(text, kind === "url" ? "url" : "text");
     const candidateAccounts = extractBankAccountsFromText(text);
     const bankMatches = checkMultipleBankAccounts(candidateAccounts);
-    return NextResponse.json(enrichAnalysisWithBankMatches(baseResult, bankMatches));
+    const enriched = enrichAnalysisWithBankMatches(baseResult, bankMatches);
+    return NextResponse.json({
+      ...enriched,
+      mlPrediction,
+    });
   } catch {
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
